@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Festival Scouting</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f1e7; --paper:#fffdf8; --ink:#16130f; --muted:#6b6358; --line:#e3dac9;
+  --accent:#e8551c; --accent-ink:#fff; --soft:#fbe7dc;
+  --aplus:#0f7a4a; --a:#3d9a5f; --aminus:#8aa83a; --b:#8b8478;
+  --warn:#b45309; --bad:#b91c1c; --chip:#efe7d8; --mark:#ffd9a8; --flagbg:#fff4e5; --flagfg:#7a3e00; --shadow:0 1px 0 rgba(0,0,0,.04),0 6px 20px -12px rgba(0,0,0,.25);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14120f; --paper:#1d1a16; --ink:#f3ede2; --muted:#a59b8c; --line:#352f27;
+    --accent:#ff6a2b; --soft:#3a2418; --chip:#2a251f; --b:#9a9284; --aminus:#a3c24b; --mark:#7a4a10; --flagbg:#3a2a12; --flagfg:#ffd9a8; --bad:#f87171; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14120f; --paper:#1d1a16; --ink:#f3ede2; --muted:#a59b8c; --line:#352f27;
+  --accent:#ff6a2b; --soft:#3a2418; --chip:#2a251f; --b:#9a9284; --aminus:#a3c24b; --mark:#7a4a10; --flagbg:#3a2a12; --flagfg:#ffd9a8; --bad:#f87171; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Archivo,system-ui,sans-serif}
+a{color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+.festbar{background:var(--ink);color:var(--paper)}
+.festbar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px;flex-wrap:wrap}
+.festlabel{font:600 11px JetBrains Mono,monospace;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.festtoggle{display:flex;gap:6px;flex-wrap:wrap}
+.festtoggle button{font:700 13px Archivo;border:1.5px solid var(--paper);background:transparent;color:var(--paper);border-radius:999px;padding:5px 14px;cursor:pointer}
+.festtoggle button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.festtoggle button:disabled{opacity:.45;cursor:not-allowed;border-style:dashed}
+.festtoggle button small{font:500 10.5px JetBrains Mono,monospace;margin-left:6px;opacity:.8}
+.lock{min-height:70vh;display:flex;align-items:center;justify-content:center;padding-block:40px}
+.lockbox{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:12px;padding:28px 24px;width:min(420px,100%);box-shadow:var(--shadow)}
+.lockbox h1{font-size:34px;margin:6px 0 8px}
+.lockbox form{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.lockerr{color:var(--bad);font-size:13.5px;min-height:1.2em}
+.app[hidden]{display:none!important}
+header.top{border-bottom:3px solid var(--ink);background:var(--paper)}
+header.top .wrap{display:flex;gap:24px;align-items:flex-end;justify-content:space-between;padding-top:28px;padding-bottom:20px;flex-wrap:wrap}
+.kicker{font:600 12px/1 JetBrains Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{text-wrap:balance;font:400 clamp(30px,5vw,54px)/.95 "Archivo Black",sans-serif;margin:8px 0 6px;letter-spacing:-.01em}
+.sub{color:var(--muted);max-width:640px}
+.stats{display:flex;gap:18px;flex-wrap:wrap}
+.stat{min-width:96px}
+.stat b{display:block;font:400 26px/1 "Archivo Black";}
+.stat span{font-size:12px;color:var(--muted)}
+.bench{margin-top:10px;font-size:13px;color:var(--muted)}
+.bench b{color:var(--ink)}
+section{padding:28px 0 8px}
+h2{font:400 24px/1.1 "Archivo Black";margin:0 0 4px;text-transform:uppercase;letter-spacing:.01em}
+h2 .tag{font:600 11px JetBrains Mono,monospace;background:var(--ink);color:var(--paper);padding:3px 7px;border-radius:3px;vertical-align:middle;margin-left:8px;letter-spacing:.08em}
+.lede{color:var(--muted);margin:0 0 16px;max-width:780px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:600 14px Archivo;padding:6px 14px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.chip small{font:500 11px JetBrains Mono,monospace;opacity:.7;margin-left:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{display:flex;flex-direction:column;justify-content:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 14px 12px;cursor:pointer;box-shadow:var(--shadow);text-align:left;color:inherit;font:inherit;transition:transform .12s ease,border-color .12s}
+.card:hover,.card:focus-visible{transform:translateY(-2px);border-color:var(--ink);outline:none}
+.card h3{margin:6px 0 2px;font:700 18px/1.2 Archivo}
+.card .meta{font-size:12.5px;color:var(--muted)}
+.card .nums{display:flex;gap:14px;margin:10px 0 8px;font:600 13px JetBrains Mono,monospace}
+.card .nums span{display:block;font:500 10.5px Archivo;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.card .pitch{font-size:13px;border-top:1px dashed var(--line);padding-top:8px}
+.card .agency{font-size:12.5px;margin-top:6px}
+.grade{display:inline-block;font:700 12px JetBrains Mono,monospace;padding:2px 8px;border-radius:4px;color:#fff;min-width:30px;text-align:center}
+.g-Aplus{background:var(--aplus)} .g-A{background:var(--a)} .g-Aminus{background:var(--aminus)} .g-B{background:var(--b)} .g-none{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.ask{display:flex;gap:8px;flex-wrap:wrap}
+.ask input{flex:1 1 320px}
+input[type=search],input[type=number],select,input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;min-width:0}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+button.go{font:700 14px Archivo;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+button.ghost{font:600 13px Archivo;background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
+.examples{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.examples button{font:500 12.5px Archivo;background:var(--chip);color:var(--ink);border:0;border-radius:999px;padding:5px 11px;cursor:pointer}
+.understood{margin-top:10px;font-size:13px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.understood .u{background:var(--soft);color:var(--ink);border-radius:4px;padding:2px 8px;font:500 12px JetBrains Mono,monospace}
+.filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:12px}
+.filters label{display:flex;flex-direction:column;gap:4px;font:600 11px JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.range{display:flex;gap:6px}
+.range input{width:100%}
+.searchrow{display:flex;gap:8px;flex-wrap:wrap}
+.searchrow input{flex:1 1 260px}
+.resultbar{display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px;gap:10px;flex-wrap:wrap}
+.count{font:600 13px JetBrains Mono,monospace}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:13.5px}
+th{position:sticky;top:0;background:var(--ink);color:var(--paper);text-align:left;font:600 11.5px JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:.05em;padding:9px 10px;cursor:pointer;white-space:nowrap;user-select:none}
+th .arr{opacity:.6;margin-left:4px}
+td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--soft)}
+td.num{font-variant-numeric:tabular-nums;font-family:JetBrains Mono,monospace;text-align:right;white-space:nowrap}
+.nf{color:var(--bad);font-weight:600}
+.muted{color:var(--muted)}
+mark{background:var(--mark);color:inherit;border-radius:2px;padding:0 1px}
+/* detail */
+dialog{border:0;padding:0;max-width:760px;width:calc(100% - 24px);border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(20,16,10,.55)}
+.dh{padding:18px 20px 14px;border-bottom:3px solid var(--ink);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.dh h3{font:400 28px/1.05 "Archivo Black";margin:6px 0 4px}
+.db{padding:6px 20px 20px;max-height:70vh;overflow:auto}
+.dgroup{margin-top:16px}
+.dgroup h4{font:600 11px JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin:0 0 6px}
+.kv{display:grid;grid-template-columns:200px 1fr;gap:4px 14px;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;word-break:break-word}
+.close{font:700 20px Archivo;background:transparent;border:0;color:var(--ink);cursor:pointer;padding:4px 8px}
+.flag{background:var(--flagbg);color:var(--flagfg);border-left:3px solid var(--warn);padding:8px 10px;border-radius:4px;font-size:13.5px}
+footer{color:var(--muted);font-size:12.5px;padding:30px 0 40px;border-top:1px solid var(--line);margin-top:30px}
+.empty{padding:22px;text-align:center;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+@media (max-width:640px){.kv{grid-template-columns:1fr}.kv dt{margin-top:6px}header.top .wrap{padding-top:18px}}
+</style>
+</head>
+<body>
+<div class="lock wrap" id="lock">
+  <div class="lockbox">
+    <div class="kicker">Private</div>
+    <h1>Festival Scouting</h1>
+    <p class="sub">Enter the password you were given to open the lineup data.</p>
+    <form id="lockForm" autocomplete="off">
+      <input type="password" id="pw" placeholder="Password" aria-label="Password" autofocus>
+      <button class="go" type="submit" id="unlockBtn">Unlock</button>
+      <div class="lockerr" id="lockErr" role="alert"></div>
+    </form>
+  </div>
+</div>
+<div class="app" id="app" hidden>
+<nav class="festbar" aria-label="Choose festival"><div class="wrap"><span class="festlabel">Festival</span><div class="festtoggle" id="festToggle" role="tablist"></div></div></nav>
+<header class="top">
+  <div class="wrap">
+    <div>
+      <div class="kicker" id="kicker"></div>
+      <h1 id="title"></h1>
+      <div class="sub" id="subtitle"></div>
+      <div class="bench" id="bench"></div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="cohort">
+    <h2>Targeted Cohort<span class="tag">SUPPORT-SLOT TARGETS</span></h2>
+    <p class="lede" id="cohortLede"></p>
+    <div class="chips" id="gradeChips" role="group" aria-label="Filter cohort by grade"></div>
+    <div class="grid" id="cohortGrid"></div>
+  </section>
+
+  <section id="ask">
+    <h2>Ask the data</h2>
+    <p class="lede">Type a question in plain English. It's read in your browser into filters — numbers, days, grades, genres, agencies, labels — and the table below updates.</p>
+    <div class="panel">
+      <form class="ask" id="askForm">
+        <input type="search" id="askInput" placeholder="e.g. emo bands on Sunday under 200k Spotify listeners booked by Sequel" aria-label="Ask a question">
+        <button class="go" type="submit">Ask</button>
+        <button class="ghost" type="button" id="askClear">Clear</button>
+      </form>
+      <div class="examples" id="examples"></div>
+      <div class="understood" id="understood"></div>
+    </div>
+  </section>
+
+  <section id="all">
+    <h2>Search &amp; filter all acts</h2>
+    <p class="lede">Search one variable or all of them, then narrow with filters.</p>
+    <div class="panel">
+      <div class="searchrow">
+        <select id="field" aria-label="Field to search"></select>
+        <input type="search" id="q" placeholder="Search…" aria-label="Search text">
+        <button class="ghost" id="reset" type="button">Reset all</button>
+      </div>
+      <div class="filters" id="filters"></div>
+    </div>
+    <div class="resultbar">
+      <div class="count" id="count"></div>
+      <div class="muted" style="font-size:12.5px">Click a column to sort · click a row for details</div>
+    </div>
+    <div class="tablewrap"><table id="tbl"><thead></thead><tbody></tbody></table></div>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+
+</div>
+<dialog id="detail" aria-labelledby="dTitle"></dialog>
+
+<script>
+// ---- Festival registry: add a festival by dropping data/<id>.js and listing it here ----
+const FEST_REGISTRY=[
+  {id:'warped-2026',label:'Warped Tour 2026'},
+  {id:'fest-2026',label:'Fest 2026'}
+];
+window.FESTS_ENC=window.FESTS_ENC||{};
+function loadScript(src){return new Promise(res=>{const s=document.createElement('script');s.src=src;s.onload=()=>res(true);s.onerror=()=>res(false);document.head.appendChild(s);});}
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function decryptFest(enc,pw){
+  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(enc.salt),iterations:enc.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(enc.iv)},key,b64(enc.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+const ssGet=k=>{try{return sessionStorage.getItem(k)}catch(e){return null}}, ssSet=(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}};
+async function unlock(pw){
+  const avail=FEST_REGISTRY.filter(f=>window.FESTS_ENC[f.id]);
+  const h=(location.hash||'').slice(1);
+  const cur=(avail.find(f=>f.id===h)||avail[0]).id;
+  const D=await decryptFest(window.FESTS_ENC[cur],pw); // throws on wrong password
+  ssSet('fs-pw',pw);
+  document.getElementById('lock').hidden=true; document.getElementById('app').hidden=false;
+  document.getElementById('festToggle').innerHTML=FEST_REGISTRY.map(f=>{const ok=!!window.FESTS_ENC[f.id];
+    return `<button role="tab" type="button" data-id="${f.id}" aria-selected="${f.id===cur}" ${ok?'':'disabled'}>${f.label}${ok?(f.id===cur?`<small>${D.bands.length}</small>`:''):'<small>coming soon</small>'}</button>`;}).join('');
+  document.getElementById('festToggle').addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(!b||b.disabled||b.dataset.id===cur)return;location.hash=b.dataset.id;location.reload();});
+  start(D);
+}
+(async function(){
+  await Promise.all(FEST_REGISTRY.map(f=>loadScript('data/'+f.id+'.enc.js')));
+  const err=document.getElementById('lockErr'), btn=document.getElementById('unlockBtn');
+  if(!window.crypto||!crypto.subtle){err.textContent='This browser can\'t decrypt the page. Open the https:// link in a current browser.';return;}
+  const saved=ssGet('fs-pw'); if(saved){try{await unlock(saved);return;}catch(e){}}
+  document.getElementById('lockForm').addEventListener('submit',async e=>{e.preventDefault();
+    const pw=document.getElementById('pw').value; if(!pw){err.textContent='Enter the password.';return;}
+    btn.disabled=true;btn.textContent='Unlocking…';err.textContent='';
+    try{await unlock(pw);}catch(x){err.textContent='That password didn\'t work. Check it and try again.';btn.disabled=false;btn.textContent='Unlock';}
+  });
+})();
+function start(D){
+const BANDS = D.bands, BM = D.benchmark;
+const $ = s => document.querySelector(s);
+const fmt = n => (n==null||n==='') ? '—' : Number(n).toLocaleString('en-US');
+const short = n => n==null ? '—' : n>=1e6 ? (n/1e6).toFixed(n>=1e7?0:1)+'M' : n>=1e3 ? (n/1e3).toFixed(n>=1e5?0:1)+'K' : String(n);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const gcls = g => g==='A+'?'g-Aplus':g==='A'?'g-A':g==='A-'?'g-Aminus':g==='B'?'g-B':'g-none';
+const GORDER = {'A+':1,'A':2,'A-':3,'B':4,'':9};
+
+// ---------- derived families ----------
+const AG = [
+ ['WME',/\bWME\b/i],['UTA',/\bUTA\b|United Talent/i],['CAA',/\bCAA\b/i],['THE·TEAM (ex-Wasserman)',/THE[·.\- ]?TEAM|Wasserman/i],
+ ['Sound Talent Group',/Sound Talent/i],['Paladin Artists',/Paladin/i],['Sequel Music Group',/Sequel/i],['33 & West',/33 ?& ?West/i],
+ ['IAG',/\bIAG\b|Independent Artist Group/i],['Ground Control Touring',/Ground Control/i],['ROAM Artists',/ROAM/i],
+ ['Dynamic Talent',/Dynamic Talent/i],['Pinnacle',/Pinnacle/i],['TKO',/\bTKO\b/i],['Paquin',/Paquin/i],['Primary Talent',/Primary Talent/i],
+ ['13 Artists',/13 Artists/i],['Destiny Tourbooking',/Destiny/i],['Swamp Booking',/Swamp/i],['Reliant',/Reliant/i]
+];
+BANDS.forEach(b=>{
+  const a=b.agency||'';
+  if(/^Not found/i.test(a)) b.agencyFamily=['Not found'];
+  else if(/No agency listed/i.test(a)) b.agencyFamily=['Self-booked'];
+  else { const f=AG.filter(([n,r])=>r.test(a)).map(x=>x[0]); b.agencyFamily=f.length?f:['Other']; }
+  b.labelFamily = /^Independent/i.test(b.label) ? 'Independent / self-released' : b.label;
+  b.genreTags = b.genre.split('/').map(s=>s.replace(/\(.*?\)/g,'').trim()).filter(Boolean);
+  b._all = Object.entries(b).filter(([k])=>!k.startsWith('_')).map(([k,v])=>Array.isArray(v)?v.join(' '):(v==null?'':String(v))).join(' \u0001 ').toLowerCase();
+});
+
+// ---------- header ----------
+document.title=D.title;$('#kicker').textContent=D.kicker;$('#title').textContent=D.title;$('#subtitle').textContent=D.subtitle;$('#cohortLede').textContent=D.cohortLede;
+$('#bench').innerHTML = `Benchmark: <b>${esc(BM.name)}</b> — ${fmt(BM.instagram)} Instagram followers · ${fmt(BM.spotify)} Spotify monthly listeners · sells out 200–300 caps. Size index 1.0 = same size.`;
+const cohortN = BANDS.filter(b=>b.grade).length;
+$('#stats').innerHTML = [
+  [BANDS.length,'acts tracked'],[cohortN,'cohort targets'],[BANDS.filter(b=>b.grade==='A+').length,'A+ targets'],
+  [BANDS.filter(b=>b.booking_evidence!=='Not found').length,'agencies found']
+].map(([n,l])=>`<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
+
+// ---------- cohort ----------
+const grades=['A+','A','A-','B','All'];
+let cohortGrade='A+';
+function renderChips(){
+  $('#gradeChips').innerHTML = grades.map(g=>{
+    const n = g==='All'?cohortN:BANDS.filter(b=>b.grade===g).length;
+    return `<button class="chip" aria-pressed="${g===cohortGrade}" data-g="${g}">${g}<small>${n}</small></button>`;
+  }).join('');
+}
+function renderCohort(){
+  renderChips();
+  const list = BANDS.filter(b=>b.grade && (cohortGrade==='All'||b.grade===cohortGrade))
+    .sort((a,b)=>GORDER[a.grade]-GORDER[b.grade]||(a.size_vs_sincere_engineer||0)-(b.size_vs_sincere_engineer||0));
+  $('#cohortGrid').innerHTML = list.map(b=>`
+    <button class="card" data-name="${esc(b.name)}">
+      <div><span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span> <span class="meta">${esc(b.day)} · ${esc(b.genre)}</span></div>
+      <h3>${esc(b.name)}</h3>
+      <div class="nums">
+        <div><span>Instagram</span>${short(b.instagram_followers)}</div>
+        <div><span>Spotify</span>${short(b.spotify_listeners)}</div>
+        <div><span>Size vs SE</span>${b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'×':'—'}</div>
+      </div>
+      <div class="pitch">${esc(b.pitch)}</div>
+      <div class="agency"><b>${esc(b.agency)}</b>${b.agent&&b.agent!=='—'?' · '+esc(b.agent):''}</div>
+    </button>`).join('') || '<div class="empty">No bands in this grade.</div>';
+}
+$('#gradeChips').addEventListener('click',e=>{const b=e.target.closest('.chip'); if(!b) return; cohortGrade=b.dataset.g; renderCohort();});
+$('#cohortGrid').addEventListener('click',e=>{const c=e.target.closest('.card'); if(c) openDetail(c.dataset.name);});
+
+// ---------- fields & filters ----------
+const FIELDS = [
+ ['_all','All variables'],['name','Artist'],['grade','Grade'],['genre','Genre / style'],['day','Day'],['status','Lineup status'],
+ ['instagram_handle','Instagram handle'],['label','Record label'],['label_note','Label notes'],['agency','Booking agency'],['agent','Booking agent'],
+ ['booking_notes','Other territories / booking notes'],['booking_evidence','Booking evidence'],['pitch','Fit / pitch angle'],['flags','Flags']
+];
+$('#field').innerHTML = FIELDS.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
+const uniq = (arr)=>[...new Set(arr)].sort((a,b)=>a.localeCompare(b));
+const FILTERS = [
+ {id:'fGrade',label:'Grade',opts:['A+','A','A-','B','Not in cohort'],test:(b,v)=>v==='Not in cohort'?!b.grade:b.grade===v},
+ {id:'fDay',label:'Day',opts:uniq(BANDS.map(b=>b.day)),test:(b,v)=>b.day===v},
+ {id:'fGenre',label:'Genre',opts:uniq(BANDS.flatMap(b=>b.genreTags)),test:(b,v)=>b.genreTags.includes(v)},
+ {id:'fAgency',label:'Booking agency',opts:uniq(BANDS.flatMap(b=>b.agencyFamily)),test:(b,v)=>b.agencyFamily.includes(v)},
+ {id:'fEvidence',label:'Booking evidence',opts:uniq(BANDS.map(b=>b.booking_evidence)),test:(b,v)=>b.booking_evidence===v},
+ {id:'fLabel',label:'Record label',opts:uniq(BANDS.map(b=>b.labelFamily)),test:(b,v)=>b.labelFamily===v},
+ {id:'fStatus',label:'Lineup status',opts:uniq(BANDS.map(b=>b.status)),test:(b,v)=>b.status===v},
+ {id:'fFlags',label:'Flags',opts:['Has flags','No flags'],test:(b,v)=>v==='Has flags'?!!b.flags:!b.flags},
+];
+$('#filters').innerHTML = FILTERS.map(f=>`<label>${f.label}<select id="${f.id}"><option value="">All</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select></label>`).join('')
+ + `<label>Instagram followers<span class="range"><input type="number" id="igMin" placeholder="min" min="0"><input type="number" id="igMax" placeholder="max" min="0"></span></label>`
+ + `<label>Spotify listeners<span class="range"><input type="number" id="spMin" placeholder="min" min="0"><input type="number" id="spMax" placeholder="max" min="0"></span></label>`
+ + `<label>Size vs Sincere Engineer<span class="range"><input type="number" step="0.1" id="siMin" placeholder="min ×"><input type="number" step="0.1" id="siMax" placeholder="max ×"></span></label>`;
+
+// ---------- state ----------
+let sortKey='grade', sortDir=1, askState=null;
+function numVal(id){const v=$('#'+id).value; return v===''?null:Number(v);}
+function currentList(){
+  const field=$('#field').value, q=$('#q').value.trim().toLowerCase();
+  let list = BANDS.filter(b=>{
+    if(q){ const hay = field==='_all'?b._all:String(b[field]||'').toLowerCase(); if(!q.split(/\s+/).every(t=>hay.includes(t))) return false; }
+    for(const f of FILTERS){const v=$('#'+f.id).value; if(v && !f.test(b,v)) return false;}
+    const r=[['igMin','igMax','instagram_followers'],['spMin','spMax','spotify_listeners'],['siMin','siMax','size_vs_sincere_engineer']];
+    for(const [mn,mx,k] of r){const a=numVal(mn),z=numVal(mx); if(a!=null&&(b[k]==null||b[k]<a))return false; if(z!=null&&(b[k]==null||b[k]>z))return false;}
+    if(askState && !askState.test(b)) return false;
+    return true;
+  });
+  list.sort((a,b)=>{
+    let x=a[sortKey], y=b[sortKey];
+    if(sortKey==='grade'){x=GORDER[x||''];y=GORDER[y||''];}
+    if(x==null||x==='')return 1; if(y==null||y==='')return -1;
+    if(typeof x==='number')return (x-y)*sortDir;
+    return String(x).localeCompare(String(y))*sortDir;
+  });
+  if(askState && askState.sort){const {key,dir,limit}=askState.sort; list.sort((a,b)=>((a[key]??-1)-(b[key]??-1))*dir); if(limit) list=list.slice(0,limit);}
+  return list;
+}
+const COLS=[['grade','Grade'],['name','Artist'],['day','Day'],['genre','Genre'],['instagram_followers','Instagram'],['spotify_listeners','Spotify'],['size_vs_sincere_engineer','Size vs SE'],['label','Label'],['agency','Booking agency'],['agent','Agent(s)']];
+function hl(text){
+  const q=$('#q').value.trim(); if(!q) return esc(text);
+  let s=esc(text); q.split(/\s+/).filter(t=>t.length>1).forEach(t=>{s=s.replace(new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'),'<mark>$1</mark>');}); return s;
+}
+function renderTable(){
+  $('#tbl thead').innerHTML='<tr>'+COLS.map(([k,l])=>`<th data-k="${k}">${l}${k===sortKey?`<span class="arr">${sortDir>0?'▲':'▼'}</span>`:''}</th>`).join('')+'</tr>';
+  const list=currentList();
+  $('#count').textContent=`${list.length} of ${BANDS.length} acts`;
+  $('#tbl tbody').innerHTML = list.map(b=>`<tr data-name="${esc(b.name)}">
+    <td>${b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'<span class="muted">—</span>'}</td>
+    <td><b>${hl(b.name)}</b></td><td>${hl(b.day)}</td><td>${hl(b.genre)}</td>
+    <td class="num">${fmt(b.instagram_followers)}</td><td class="num">${fmt(b.spotify_listeners)}</td>
+    <td class="num">${b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'×':'—'}</td>
+    <td>${hl(b.label)}</td><td class="${b.booking_evidence==='Not found'?'nf':''}">${hl(b.agency)}</td><td>${hl(b.agent)}</td></tr>`).join('')
+    || `<tr><td colspan="${COLS.length}" class="empty">No acts match. Try loosening a filter.</td></tr>`;
+}
+$('#tbl thead').addEventListener('click',e=>{const th=e.target.closest('th'); if(!th)return; const k=th.dataset.k; if(sortKey===k)sortDir*=-1; else{sortKey=k;sortDir=(k.includes('followers')||k.includes('listeners')||k.includes('size'))?-1:1;} renderTable();});
+$('#tbl tbody').addEventListener('click',e=>{const tr=e.target.closest('tr[data-name]'); if(tr) openDetail(tr.dataset.name);});
+['#q','#field'].forEach(s=>$(s).addEventListener('input',renderTable));
+$('#filters').addEventListener('input',renderTable);
+$('#reset').addEventListener('click',()=>{$('#q').value='';$('#field').value='_all';$('#filters').querySelectorAll('select,input').forEach(x=>x.value='');clearAsk();renderTable();});
+
+// ---------- qualitative search ----------
+const EX=D.examples||[];
+$('#examples').innerHTML=EX.map(x=>`<button type="button">${esc(x)}</button>`).join('');
+$('#examples').addEventListener('click',e=>{if(e.target.tagName==='BUTTON'){$('#askInput').value=e.target.textContent;runAsk();}});
+const GENRES = uniq(BANDS.flatMap(b=>b.genreTags));
+const LABELS = uniq(BANDS.map(b=>b.label)).filter(l=>!/^Not found|^Independent/i.test(l));
+const STOP = new Set('a an the and or of on in at by with for to from who which what show me find list all bands band acts act artists artist are is that have has their them playing play plays any some give booked book books do does were was than like about near around please'.split(' '));
+function parseNum(s){const m=s.match(/([\d.,]+)\s*(k|m|thousand|million)?/i); if(!m)return null; let n=parseFloat(m[1].replace(/,/g,'')); const u=(m[2]||'').toLowerCase(); if(u==='k'||u==='thousand')n*=1e3; if(u==='m'||u==='million')n*=1e6; return n;}
+function parseAsk(text){
+  let t=' '+text.toLowerCase().replace(/[’']/g,"'")+' '; const tests=[], notes=[]; let sort=null;
+  const eat=re=>{t=t.replace(re,' ');};
+  // grades
+  const gm=[...t.matchAll(/\b(?:grade|tier)?\s*(a\+|a-|a minus|a plus|\ba\b(?!\s*(?:lot|few|band))|\bb\b(?=\s*(?:tier|grade|bands?|$)))/g)];
+  let gs=[]; if(/\ba\+|a plus/.test(t))gs.push('A+'); if(/\ba-(?!\w)|a minus/.test(t))gs.push('A-'); if(/\b(?:tier|grade)\s+a\b(?![+-])|\ba (?:tier|grade)\b|\ba bands\b/.test(t))gs.push('A'); if(/\b(?:tier|grade)\s+b\b|\bb (?:tier|grade)\b|\bb bands\b/.test(t))gs.push('B');
+  if(gs.length){tests.push(b=>gs.includes(b.grade)); notes.push('grade: '+gs.join(', ')); eat(/\b(?:grade|tier)\s*/g); eat(/a\+|a plus|\ba-(?!\w)|a minus|\ba bands\b|\bb bands\b/g);}
+  if(/cohort|target|candidate/.test(t)&&!gs.length){tests.push(b=>!!b.grade); notes.push('cohort only'); eat(/cohort|targets?|candidates?/g);}
+  // day
+  if(/\bsat(urday)?\b|nov(ember)?\s*14/.test(t)){tests.push(b=>b.day==='Saturday');notes.push('day: Saturday');eat(/\bsat(urday)?\b|nov(ember)?\s*14(th)?/g);}
+  if(/\bsun(day)?\b|nov(ember)?\s*15/.test(t)){tests.push(b=>b.day==='Sunday');notes.push('day: Sunday');eat(/\bsun(day)?\b|nov(ember)?\s*15(th)?/g);}
+  // size vs SE
+  const se='(?:sincere engineer|se\\b|us\\b|our size)';
+  if(new RegExp('(?:same size|similar(?: size)?|about the same|comparable|like)\\s*(?:as|to)?\\s*'+se).test(t)||/same size|similar size|our size/.test(t)){tests.push(b=>b.size_vs_sincere_engineer!=null&&b.size_vs_sincere_engineer>=0.7&&b.size_vs_sincere_engineer<=1.4);notes.push('size 0.7–1.4× SE');eat(/same size|similar size|similar|about the same|comparable|our size|sincere engineer|\bas\b/g);}
+  else{
+    if(new RegExp('(bigger|larger) than\\s*'+se).test(t)){tests.push(b=>(b.size_vs_sincere_engineer||0)>1);notes.push('size > 1× SE');eat(/(bigger|larger) than/g);}
+    if(new RegExp('smaller than\\s*'+se).test(t)){tests.push(b=>b.size_vs_sincere_engineer!=null&&b.size_vs_sincere_engineer<1);notes.push('size < 1× SE');eat(/smaller than/g);}
+    const mx=t.match(/(?:under|below|less than|up to|max(?:imum)?)\s*([\d.]+)\s*x\b/); if(mx){const v=+mx[1];tests.push(b=>b.size_vs_sincere_engineer!=null&&b.size_vs_sincere_engineer<=v);notes.push('size ≤ '+v+'×');eat(/(?:but\s*)?(?:under|below|less than|up to|max(?:imum)?)\s*[\d.]+\s*x\b/);}
+    const mn=t.match(/(?:over|above|more than|at least)\s*([\d.]+)\s*x\b/); if(mn){const v=+mn[1];tests.push(b=>(b.size_vs_sincere_engineer||0)>=v);notes.push('size ≥ '+v+'×');eat(/(?:over|above|more than|at least)\s*[\d.]+\s*x\b/);}
+    eat(/sincere engineer/g);
+  }
+  // numeric thresholds
+  const numRe=/(under|below|less than|fewer than|at most|<|over|above|more than|greater than|at least|>|between)\s*([\d.,]+\s*(?:k|m|thousand|million)?)(?:\s*(?:and|-|to)\s*([\d.,]+\s*(?:k|m|thousand|million)?))?\s*(spotify|monthly|listeners|instagram|ig|insta|followers)?(?:\s*(monthly listeners|listeners|followers))?/g;
+  for(const m of [...t.matchAll(numRe)]){
+    const op=m[1], a=parseNum(m[2]), b2=m[3]?parseNum(m[3]):null, what=(m[4]||'')+' '+(m[5]||'');
+    if(a==null) continue;
+    let key = /insta|\big\b|followers/.test(what)?'instagram_followers':'spotify_listeners';
+    if(!/spotify|monthly|listeners|insta|\big\b|followers/.test(what)){const after=t.slice(m.index+m[0].length,m.index+m[0].length+30), before=t.slice(Math.max(0,m.index-30),m.index);
+      if(/insta|\big\b|follower/.test(after))key='instagram_followers'; else if(!/spotify|listener/.test(after)){const bi=Math.max(before.lastIndexOf('insta'),before.lastIndexOf(' ig'),before.lastIndexOf('follower')), bs=Math.max(before.lastIndexOf('spotify'),before.lastIndexOf('listener')); if(bi>bs)key='instagram_followers';}}
+    const lab=key==='instagram_followers'?'Instagram':'Spotify';
+    if(op==='between'&&b2!=null){tests.push(b=>b[key]!=null&&b[key]>=a&&b[key]<=b2);notes.push(`${lab} ${short(a)}–${short(b2)}`);}
+    else if(/under|below|less|fewer|most|</.test(op)){tests.push(b=>b[key]!=null&&b[key]<a);notes.push(`${lab} < ${short(a)}`);}
+    else {tests.push(b=>b[key]!=null&&b[key]>a);notes.push(`${lab} > ${short(a)}`);}
+    t=t.replace(m[0],' ');
+  }
+  // sorting / top N
+  const top=t.match(/\b(top|biggest|largest|most popular|smallest|least)\s*(\d+)?/);
+  if(top){const small=/smallest|least/.test(top[1]); let key=/insta|\big\b|follower/.test(t)?'instagram_followers':/spotify|listener/.test(t)?'spotify_listeners':'size_vs_sincere_engineer';
+    const n=top[2]?+top[2]:(t.match(/\b(\d+)\b/)||[])[1]; sort={key,dir:small?1:-1,limit:n?+n:null}; notes.push(`sort: ${small?'smallest':'largest'} by ${key.replace(/_/g,' ')}${n?' · top '+n:''}`); eat(/\b(top|biggest|largest|most popular|smallest|least)\s*\d*/g); eat(/\bby\s*(instagram|ig|spotify|listeners|followers)\b/g);}
+  // booking
+  if(/no (booking )?(agent|agency)|without (an? )?(agent|agency)|(agent|agency) (not found|unknown|missing)|missing (agent|agency)|unrepresented/.test(t)){tests.push(b=>b.booking_evidence==='Not found');notes.push('agency not found');eat(/no (booking )?(agent|agency)( found)?|without (an? )?(agent|agency)|(agent|agency) (not found|unknown|missing)|missing (agent|agency)|unrepresented|found/g);}
+  if(/self[- ]booked|book themselves|diy booking/.test(t)){tests.push(b=>b.agencyFamily.includes('Self-booked'));notes.push('self-booked');eat(/self[- ]booked|book themselves|diy booking/g);}
+  if(/conflict|flag|uncertain|unverified/.test(t)){tests.push(b=>!!b.flags||/conflict|unverified/i.test(b.booking_evidence+b.agent));notes.push('has flags / conflicts');eat(/conflicts?|flag(s|ged)?|uncertain|unverified/g);}
+  for(const [n,r] of AG){const key=n.toLowerCase().split(' ')[0].replace(/[()·]/g,''); const re=new RegExp('\\b'+(n==='THE·TEAM (ex-Wasserman)'?'(?:the ?team|wasserman)':n==='33 & West'?'33 ?(?:&|and) ?west':key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))+'\\b','i');
+    if(re.test(t)&&!['primary'].includes(key)||(n==='Primary Talent'&&/primary talent/.test(t))){tests.push(b=>b.agencyFamily.includes(n));notes.push('agency: '+n);t=t.replace(re,' ');}}
+  // label
+  if(/\bindependent|self[- ]released|unsigned|no label/.test(t)){tests.push(b=>b.labelFamily==='Independent / self-released');notes.push('label: independent');eat(/\bindependent|self[- ]released|unsigned|no label/g);}
+  for(const L of LABELS){const core=L.toLowerCase().replace(/\(.*?\)/g,'').replace(/records?|music( group)?|recordings|entertainment|inc\.?/g,'').split('/')[0].trim(); if(core.length<3) continue;
+    if(new RegExp('\\b'+core.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b').test(t)){tests.push(b=>b.label.toLowerCase().includes(core));notes.push('label: '+L.split('/')[0].trim());t=t.replace(new RegExp(core.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'),' ');}}
+  // genre
+  const gq=[]; const alias={'pop punk':'pop-punk','poppunk':'pop-punk','metal core':'metalcore','post hardcore':'post-hardcore','hip hop':'hip-hop','rap':'hip-hop','ska':'ska-punk','emo rap':'emo-rap'};
+  for(const [k,v] of Object.entries(alias)) t=t.replace(new RegExp('\\b'+k+'\\b','g'),v);
+  for(const g of GENRES.slice().sort((a,b)=>b.length-a.length)){const gl=g.toLowerCase(); if(new RegExp('(^|[^\\w-])'+gl.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^\\w-]|$)').test(t)){gq.push(g); t=t.replace(gl,' ');}}
+  if(/\bheavy\b/.test(t)){['Metalcore','Deathcore','Hardcore','Melodic hardcore','Nu-metal','Alt-metal','Progressive metal','Southern metal'].forEach(g=>GENRES.includes(g)&&gq.push(g));eat(/\bheavy\b/g);}
+  if(gq.length){tests.push(b=>b.genreTags.some(x=>gq.includes(x)));notes.push('genre: '+gq.join(' or '));}
+  // leftover words -> text
+  const words=t.replace(/[^a-z0-9+&.\- ]/g,' ').split(/\s+/).filter(w=>w&&!STOP.has(w)&&w.length>2&&!/^\d+$/.test(w)&&!/^(spotify|listeners|instagram|followers|monthly|insta|bigger|smaller|size|x|but|under|over|records?|label|agency|agent|booking|who|book)$/.test(w));
+  if(words.length){tests.push(b=>words.every(w=>b._all.includes(w)));notes.push('text: '+words.join(' '));}
+  return {test:b=>tests.every(f=>f(b)),notes,sort};
+}
+function runAsk(){const v=$('#askInput').value.trim(); if(!v){clearAsk();renderTable();return;} askState=parseAsk(v);
+  $('#understood').innerHTML='Understood as: '+(askState.notes.length?askState.notes.map(n=>`<span class="u">${esc(n)}</span>`).join(''):'<span class="u">no filters recognized</span>');
+  renderTable(); document.getElementById('all').scrollIntoView({behavior:'smooth',block:'start'});}
+function clearAsk(){askState=null;$('#askInput').value='';$('#understood').innerHTML='';}
+$('#askForm').addEventListener('submit',e=>{e.preventDefault();runAsk();});
+$('#askClear').addEventListener('click',()=>{clearAsk();renderTable();});
+
+// ---------- detail ----------
+function link(u,label){return u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(label||u)}</a>`:'—';}
+function links(s){if(!s)return '—'; return esc(s).replace(/(https?:\/\/[^\s;,)]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
+function openDetail(name){
+  const b=BANDS.find(x=>x.name===name); if(!b) return;
+  const kv=rows=>'<dl class="kv">'+rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')+'</dl>';
+  const d=$('#detail');
+  d.innerHTML=`<div class="dh"><div>
+      <div>${b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'<span class="grade g-none">not in cohort</span>'} <span class="muted" style="font-size:13px">${esc(b.day)} · ${esc(b.genre)}</span></div>
+      <h3 id="dTitle">${esc(b.name)}</h3><div class="muted" style="font-size:13px">${esc(b.status)}</div></div>
+      <button class="close" aria-label="Close" id="dClose">✕</button></div>
+    <div class="db">
+      ${b.flags?`<div class="dgroup"><div class="flag"><b>Flags:</b> ${esc(b.flags)}</div></div>`:''}
+      ${b.grade?`<div class="dgroup"><h4>Targeting</h4>${kv([['Grade',esc(b.grade)],['Fit / pitch angle',esc(b.pitch)],['Size vs Sincere Engineer',b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'×':'—']])}</div>`:''}
+      <div class="dgroup"><h4>Audience</h4>${kv([
+        ['Instagram followers',`<b>${fmt(b.instagram_followers)}</b> <span class="muted">(${esc(b.instagram_source)})</span>`],
+        ['Instagram handle',link(b.instagram_url,b.instagram_handle)],
+        ['Social Blade',fmt(b.ig_socialblade)],['HypeAuditor',fmt(b.ig_hypeauditor)+(b.ig_hypeauditor_date?` <span class="muted">(${esc(b.ig_hypeauditor_date)})</span>`:'')],
+        ['Spotify monthly listeners',`<b>${fmt(b.spotify_listeners)}</b> <span class="muted">(read from Spotify, Oct 1 2026)</span>`],
+        ['Spotify profile',link(b.spotify_url,'Open on Spotify')],
+        ['Size vs Sincere Engineer',b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'×':'—']])}</div>
+      <div class="dgroup"><h4>Record label</h4>${kv([['Label',esc(b.label)],['Notes',esc(b.label_note)||'—'],['Source',links(b.label_source)]])}</div>
+      <div class="dgroup"><h4>Booking</h4>${kv([['Agency (North America)',`<b class="${b.booking_evidence==='Not found'?'nf':''}">${esc(b.agency)}</b>`],['Agent(s)',esc(b.agent)],['Other territories / notes',esc(b.booking_notes)||'—'],['Evidence',esc(b.booking_evidence)],['Source',links(b.booking_source)]])}</div>
+    </div>`;
+  d.showModal(); $('#dClose').onclick=()=>d.close();
+}
+$('#detail').addEventListener('click',e=>{if(e.target.id==='detail')e.target.close();});
+
+$('#foot').innerHTML=`<b>${esc(D.label)}</b> · data compiled ${esc(D.generated)}. ${esc(D.notes||'')} Ask-the-data runs entirely in your browser with keyword rules — no AI service.`;
+
+renderCohort(); renderTable();
+}
+</script>
+</body>
+</html>
