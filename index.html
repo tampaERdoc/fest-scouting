@@ -201,6 +201,7 @@ const FEST_REGISTRY=[
   {id:'warped-2026',label:'Warped Tour 2026'},
   {id:'fest-2026',label:'Fest 2026'}
 ];
+const ALL={id:'all',label:'All Festivals'};
 window.FESTS_ENC=window.FESTS_ENC||{};
 function loadScript(src){return new Promise(res=>{const s=document.createElement('script');s.src=src;s.onload=()=>res(true);s.onerror=()=>res(false);document.head.appendChild(s);});}
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
@@ -211,16 +212,38 @@ async function decryptFest(enc,pw){
   return JSON.parse(new TextDecoder().decode(pt));
 }
 const ssGet=k=>{try{return sessionStorage.getItem(k)}catch(e){return null}}, ssSet=(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}};
+function combine(sets){
+  const bands=[]; sets.forEach(d=>d.bands.forEach(b=>bands.push(Object.assign({},b,{festival:d.label}))));
+  const ex=[]; sets.forEach(d=>(d.examples||[]).forEach(e=>{if(ex.length<12&&!ex.includes(e))ex.push(e);}));
+  return {id:'all',label:'All Festivals',
+    kicker:sets.map(d=>d.kicker).join('  ·  '),
+    title:'Festival Scouting',
+    subtitle:`Every act across ${sets.map(d=>d.label).join(' and ')} — ${bands.length} acts with Instagram, Spotify, label and booking data, plus the graded support-slot cohort from both bills.`,
+    cohortLede:"Bands about Sincere Engineer's size across both festivals, graded by musical fit. A+ is shown first. Click any band for the full record.",
+    generated:sets[0].generated, benchmark:sets[0].benchmark,
+    examples:['A+ bands across both festivals','bands on Pure Noise Records','who does Ground Control book','same size as Sincere Engineer','emo bands under 150k Spotify listeners','bands with no booking agent found','top 10 biggest by Spotify','self-booked bands','ska-punk bands','independent bands over 100k listeners','pop-punk booked by Sequel','A+ and A bands'],
+    notes:sets.map(d=>`${d.label}: ${d.notes}`).join('  '),
+    bands:bands};
+}
 async function unlock(pw){
   const avail=FEST_REGISTRY.filter(f=>window.FESTS_ENC[f.id]);
+  if(!avail.length) throw new Error('no data files');
+  const sets={};
+  for(const f of avail) sets[f.id]=await decryptFest(window.FESTS_ENC[f.id],pw); // throws on wrong password
+  Object.entries(sets).forEach(([id,d])=>{const lab=(FEST_REGISTRY.find(f=>f.id===id)||{}).label; d.label=d.label||lab; d.bands.forEach(b=>{b.festival=d.label;});});
+  const order=avail.map(f=>f.id).concat(avail.length>1?['all']:[]);
   const h=(location.hash||'').slice(1);
-  const cur=(avail.find(f=>f.id===h)||avail[0]).id;
-  const D=await decryptFest(window.FESTS_ENC[cur],pw); // throws on wrong password
+  const cur=order.includes(h)?h:order[0];
+  const D=cur==='all'?combine(avail.map(f=>sets[f.id])):sets[cur];
   ssSet('fs-pw',pw);
   document.getElementById('lock').hidden=true; document.getElementById('app').hidden=false;
-  document.getElementById('festToggle').innerHTML=FEST_REGISTRY.map(f=>{const ok=!!window.FESTS_ENC[f.id];
-    return `<button role="tab" type="button" data-id="${f.id}" aria-selected="${f.id===cur}" ${ok?'':'disabled'}>${f.label}${ok?(f.id===cur?`<small>${D.bands.length}</small>`:''):'<small>coming soon</small>'}</button>`;}).join('');
+  const buttons=FEST_REGISTRY.concat(avail.length>1?[ALL]:[]);
+  document.getElementById('festToggle').innerHTML=buttons.map(f=>{
+    const ok=f.id==='all'||!!window.FESTS_ENC[f.id];
+    const n=f.id==='all'?Object.values(sets).reduce((a,d)=>a+d.bands.length,0):(sets[f.id]?sets[f.id].bands.length:0);
+    return `<button role="tab" type="button" data-id="${f.id}" aria-selected="${f.id===cur}" ${ok?'':'disabled'}>${f.label}${ok?`<small>${n}</small>`:'<small>coming soon</small>'}</button>`;}).join('');
   document.getElementById('festToggle').addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(!b||b.disabled||b.dataset.id===cur)return;location.hash=b.dataset.id;location.reload();});
+  window.addEventListener('hashchange',()=>{const h=(location.hash||'').slice(1); if(h!==cur) location.reload();});
   start(D);
 }
 (async function(){
@@ -236,6 +259,8 @@ async function unlock(pw){
 })();
 function start(D){
 const BANDS = D.bands, BM = D.benchmark;
+const MULTI = new Set(BANDS.map(b=>b.festival)).size>1;
+
 const $ = s => document.querySelector(s);
 const fmt = n => (n==null||n==='') ? '—' : Number(n).toLocaleString('en-US');
 const short = n => n==null ? '—' : n>=1e6 ? (n/1e6).toFixed(n>=1e7?0:1)+'M' : n>=1e3 ? (n/1e3).toFixed(n>=1e5?0:1)+'K' : String(n);
@@ -249,13 +274,17 @@ const AG = [
  ['Sound Talent Group',/Sound Talent/i],['Paladin Artists',/Paladin/i],['Sequel Music Group',/Sequel/i],['33 & West',/33 ?& ?West/i],
  ['IAG',/\bIAG\b|Independent Artist Group/i],['Ground Control Touring',/Ground Control/i],['ROAM Artists',/ROAM/i],
  ['Dynamic Talent',/Dynamic Talent/i],['Pinnacle',/Pinnacle/i],['TKO',/\bTKO\b/i],['Paquin',/Paquin/i],['Primary Talent',/Primary Talent/i],
- ['13 Artists',/13 Artists/i],['Destiny Tourbooking',/Destiny/i],['Swamp Booking',/Swamp/i],['Reliant',/Reliant/i]
+ ['13 Artists',/13 Artists/i],['Destiny Tourbooking',/Destiny/i],['Swamp Booking',/Swamp/i],['Reliant',/Reliant/i],
+ ['High Road Touring',/High Road/i],['Peachy',/\bPeachy\b/i],['Exponential Booking',/Exponential/i],['Do It Booking',/Do ?It Booking/i],
+ ['Wired Tour Booking',/\bWired\b/i],['Covert Booking',/Covert/i],['Atomic Music Group',/Atomic Music/i],['Good Company',/Good Company/i],
+ ['Heavy Talent',/Heavy Talent/i],['Avocado Booking',/Avocado/i],['Mint Talent Group',/Mint Talent/i],['Epidemic Records',/Epidemic/i]
 ];
+const cleanAgency = a => a.split(/[(;—]|\s-\s/)[0].replace(/\b(North America|NA|US|USA)\b/gi,'').replace(/[,\s]+$/,'').trim();
 BANDS.forEach(b=>{
   const a=b.agency||'';
-  if(/^Not found/i.test(a)) b.agencyFamily=['Not found'];
-  else if(/No agency listed/i.test(a)) b.agencyFamily=['Self-booked'];
-  else { const f=AG.filter(([n,r])=>r.test(a)).map(x=>x[0]); b.agencyFamily=f.length?f:['Other']; }
+  if(/^Not found/i.test(a)||!a) b.agencyFamily=['Not found'];
+  else if(/self[- ]booked|No agency listed/i.test(a)) b.agencyFamily=['Self-booked'];
+  else { const f=AG.filter(([n,r])=>r.test(a)).map(x=>x[0]); b.agencyFamily=f.length?f:[cleanAgency(a)||'Other']; }
   b.labelFamily = /^Independent/i.test(b.label) ? 'Independent / self-released' : b.label;
   b.genreTags = b.genre.split('/').map(s=>s.replace(/\(.*?\)/g,'').trim()).filter(Boolean);
   b._all = Object.entries(b).filter(([k])=>!k.startsWith('_')).map(([k,v])=>Array.isArray(v)?v.join(' '):(v==null?'':String(v))).join(' \u0001 ').toLowerCase();
@@ -285,7 +314,7 @@ function renderCohort(){
     .sort((a,b)=>GORDER[a.grade]-GORDER[b.grade]||(a.size_vs_sincere_engineer||0)-(b.size_vs_sincere_engineer||0));
   $('#cohortGrid').innerHTML = list.map(b=>`
     <button class="card" data-name="${esc(b.name)}">
-      <div><span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span> <span class="meta">${esc(b.day)} · ${esc(b.genre)}</span></div>
+      <div><span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span> <span class="meta">${MULTI?esc(b.festival)+' · ':''}${esc(b.day)} · ${esc(b.genre)}</span></div>
       <h3>${esc(b.name)}</h3>
       <div class="nums">
         <div><span>Instagram</span>${short(b.instagram_followers)}</div>
@@ -301,16 +330,18 @@ $('#cohortGrid').addEventListener('click',e=>{const c=e.target.closest('.card');
 
 // ---------- fields & filters ----------
 const FIELDS = [
- ['_all','All variables'],['name','Artist'],['grade','Grade'],['genre','Genre / style'],['day','Day'],['status','Lineup status'],
+ ['_all','All variables'],['name','Artist'],['festival','Festival'],['grade','Grade'],['genre','Genre / style'],['hometown','Hometown'],['day','Day'],['status','Lineup status'],
  ['instagram_handle','Instagram handle'],['label','Record label'],['label_note','Label notes'],['agency','Booking agency'],['agent','Booking agent'],
  ['booking_notes','Other territories / booking notes'],['booking_evidence','Booking evidence'],['pitch','Fit / pitch angle'],['flags','Flags']
 ];
 $('#field').innerHTML = FIELDS.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
 const uniq = (arr)=>[...new Set(arr)].sort((a,b)=>a.localeCompare(b));
 const FILTERS = [
+ ...(MULTI?[{id:'fFest',label:'Festival',opts:uniq(BANDS.map(b=>b.festival||'')),test:(b,v)=>b.festival===v}]:[]),
  {id:'fGrade',label:'Grade',opts:['A+','A','A-','B','Not in cohort'],test:(b,v)=>v==='Not in cohort'?!b.grade:b.grade===v},
  {id:'fDay',label:'Day',opts:uniq(BANDS.map(b=>b.day)),test:(b,v)=>b.day===v},
  {id:'fGenre',label:'Genre',opts:uniq(BANDS.flatMap(b=>b.genreTags)),test:(b,v)=>b.genreTags.includes(v)},
+ {id:'fHome',label:'Hometown',opts:uniq(BANDS.map(b=>b.hometown||'').filter(Boolean)),test:(b,v)=>b.hometown===v},
  {id:'fAgency',label:'Booking agency',opts:uniq(BANDS.flatMap(b=>b.agencyFamily)),test:(b,v)=>b.agencyFamily.includes(v)},
  {id:'fEvidence',label:'Booking evidence',opts:uniq(BANDS.map(b=>b.booking_evidence)),test:(b,v)=>b.booking_evidence===v},
  {id:'fLabel',label:'Record label',opts:uniq(BANDS.map(b=>b.labelFamily)),test:(b,v)=>b.labelFamily===v},
@@ -345,7 +376,7 @@ function currentList(){
   if(askState && askState.sort){const {key,dir,limit}=askState.sort; list.sort((a,b)=>((a[key]??-1)-(b[key]??-1))*dir); if(limit) list=list.slice(0,limit);}
   return list;
 }
-const COLS=[['grade','Grade'],['name','Artist'],['day','Day'],['genre','Genre'],['instagram_followers','Instagram'],['spotify_listeners','Spotify'],['size_vs_sincere_engineer','Size vs SE'],['label','Label'],['agency','Booking agency'],['agent','Agent(s)']];
+const COLS=[['grade','Grade'],['name','Artist'],...(MULTI?[['festival','Festival']]:[]),['day','Day'],['genre','Genre'],['instagram_followers','Instagram'],['spotify_listeners','Spotify'],['size_vs_sincere_engineer','Size vs SE'],['label','Label'],['agency','Booking agency'],['agent','Agent(s)']];
 function hl(text){
   const q=$('#q').value.trim(); if(!q) return esc(text);
   let s=esc(text); q.split(/\s+/).filter(t=>t.length>1).forEach(t=>{s=s.replace(new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'),'<mark>$1</mark>');}); return s;
@@ -370,15 +401,21 @@ $('#reset').addEventListener('click',()=>{$('#q').value='';$('#field').value='_a
 
 // ---------- qualitative search ----------
 const EX=D.examples||[];
+if(EX[0])$('#askInput').placeholder='e.g. '+EX[0];
 $('#examples').innerHTML=EX.map(x=>`<button type="button">${esc(x)}</button>`).join('');
 $('#examples').addEventListener('click',e=>{if(e.target.tagName==='BUTTON'){$('#askInput').value=e.target.textContent;runAsk();}});
 const GENRES = uniq(BANDS.flatMap(b=>b.genreTags));
 const LABELS = uniq(BANDS.map(b=>b.label)).filter(l=>!/^Not found|^Independent/i.test(l));
-const STOP = new Set('a an the and or of on in at by with for to from who which what show me find list all bands band acts act artists artist are is that have has their them playing play plays any some give booked book books do does were was than like about near around please'.split(' '));
+const STOP = new Set('across both festival festivals combined everywhere a an the and or of on in at by with for to from who which what show me find list all bands band acts act artists artist are is that have has their them playing play plays any some give booked book books do does were was than like about near around please'.split(' '));
 function parseNum(s){const m=s.match(/([\d.,]+)\s*(k|m|thousand|million)?/i); if(!m)return null; let n=parseFloat(m[1].replace(/,/g,'')); const u=(m[2]||'').toLowerCase(); if(u==='k'||u==='thousand')n*=1e3; if(u==='m'||u==='million')n*=1e6; return n;}
 function parseAsk(text){
   let t=' '+text.toLowerCase().replace(/[’']/g,"'")+' '; const tests=[], notes=[]; let sort=null;
   const eat=re=>{t=t.replace(re,' ');};
+  // festival
+  if(MULTI){
+    if(/\bwarped\b/.test(t)){tests.push(b=>/warped/i.test(b.festival||''));notes.push('festival: Warped Tour 2026');eat(/\bwarped( tour)?( 2026)?\b|\borlando\b/g);}
+    else if(/\bfest\b|\bfest ?24\b|gainesville/.test(t)){tests.push(b=>/^fest/i.test(b.festival||''));notes.push('festival: Fest 2026');eat(/\bfest ?24\b|\bfest( 2026)?\b|gainesville/g);}
+  }
   // grades
   const gm=[...t.matchAll(/\b(?:grade|tier)?\s*(a\+|a-|a minus|a plus|\ba\b(?!\s*(?:lot|few|band))|\bb\b(?=\s*(?:tier|grade|bands?|$)))/g)];
   let gs=[]; if(/\ba\+|a plus/.test(t))gs.push('A+'); if(/\ba-(?!\w)|a minus/.test(t))gs.push('A-'); if(/\b(?:tier|grade)\s+a\b(?![+-])|\ba (?:tier|grade)\b|\ba bands\b/.test(t))gs.push('A'); if(/\b(?:tier|grade)\s+b\b|\bb (?:tier|grade)\b|\bb bands\b/.test(t))gs.push('B');
@@ -451,12 +488,13 @@ function openDetail(name){
   const kv=rows=>'<dl class="kv">'+rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')+'</dl>';
   const d=$('#detail');
   d.innerHTML=`<div class="dh"><div>
-      <div>${b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'<span class="grade g-none">not in cohort</span>'} <span class="muted" style="font-size:13px">${esc(b.day)} · ${esc(b.genre)}</span></div>
+      <div>${b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'<span class="grade g-none">not in cohort</span>'} <span class="muted" style="font-size:13px">${b.festival?esc(b.festival)+' · ':''}${esc(b.day)} · ${esc(b.genre)}</span></div>
       <h3 id="dTitle">${esc(b.name)}</h3><div class="muted" style="font-size:13px">${esc(b.status)}</div></div>
       <button class="close" aria-label="Close" id="dClose">✕</button></div>
     <div class="db">
       ${b.flags?`<div class="dgroup"><div class="flag"><b>Flags:</b> ${esc(b.flags)}</div></div>`:''}
       ${b.grade?`<div class="dgroup"><h4>Targeting</h4>${kv([['Grade',esc(b.grade)],['Fit / pitch angle',esc(b.pitch)],['Size vs Sincere Engineer',b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'×':'—']])}</div>`:''}
+      ${b.hometown?`<div class="dgroup"><h4>Band</h4>${kv([['Hometown',esc(b.hometown)],['Festival',esc(b.festival||'')]])}</div>`:''}
       <div class="dgroup"><h4>Audience</h4>${kv([
         ['Instagram followers',`<b>${fmt(b.instagram_followers)}</b> <span class="muted">(${esc(b.instagram_source)})</span>`],
         ['Instagram handle',link(b.instagram_url,b.instagram_handle)],
