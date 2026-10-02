@@ -123,13 +123,14 @@ section > h2 .of{font-weight:400;color:var(--faint);font-size:15px}
 /* ---------- cohort cards ---------- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(282px,1fr));gap:1px;background:var(--hair);
   border:1px solid var(--hair);border-radius:10px;overflow:hidden}
-.card{background:var(--panel);border:0;border-left:3px solid var(--rule);padding:15px 16px 16px;cursor:pointer;
+.card{background:var(--panel);border:0;border-left:3px solid var(--rule);padding:15px 16px 16px;
   text-align:left;color:inherit;font:inherit;display:flex;flex-direction:column;gap:9px}
-.card:hover,.card:focus-visible{background:var(--sunk);outline:none}
+.card:hover,.card:focus-within{background:var(--sunk)}
+.cardbody:focus-visible{outline:2px solid var(--focus);outline-offset:-3px;border-radius:4px}
 .card.k-Aplus{border-left-color:var(--aplus)} .card.k-A{border-left-color:var(--a)}
 .card.k-Aminus{border-left-color:var(--aminus)} .card.k-B{border-left-color:var(--b)}
 .card.k-C{border-left-color:var(--c)} .card.k-D,.card.k-none{border-left-color:var(--hair)}
-.card .hd{display:flex;align-items:baseline;gap:8px}
+.card .hd{display:flex;align-items:baseline;gap:8px;padding-right:26px}
 .card h3{font:600 17.5px/1.25 "Instrument Sans",sans-serif;flex:1}
 .card .tags{display:flex;flex-wrap:wrap;gap:4px}
 .tagpill{font-size:11.5px;line-height:1.5;color:var(--muted);background:var(--sunk);border-radius:4px;padding:1px 6px;white-space:nowrap}
@@ -143,6 +144,36 @@ section > h2 .of{font-weight:400;color:var(--faint);font-size:15px}
 .card .agency{font-size:12.5px;color:var(--muted);margin-top:auto;padding-top:4px;border-top:1px solid var(--hair)}
 .card .agency b{color:var(--body);font-weight:600}
 .card .agency.nf{color:var(--faint)}
+
+/* ---------- picking + export ---------- */
+.card{position:relative}
+.cardbody{background:none;border:0;padding:0;margin:0;text-align:left;color:inherit;font:inherit;cursor:pointer;
+  display:flex;flex-direction:column;gap:9px;flex:1}
+.cardbody::after{content:"";position:absolute;inset:0}
+.pick{position:absolute;top:11px;right:11px;z-index:2;display:grid;place-items:center;width:22px;height:22px;cursor:pointer}
+.pick input{appearance:none;-webkit-appearance:none;width:16px;height:16px;margin:0;border:1.5px solid var(--rule);
+  border-radius:4px;background:var(--panel);cursor:pointer;display:grid;place-items:center}
+.pick input:hover{border-color:var(--datum)}
+.pick input:checked{background:var(--datum);border-color:var(--datum)}
+.pick input:checked::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;
+  transform:rotate(-45deg) translate(1px,-1px)}
+.card:has(.pick input:checked){background:var(--datum-soft)}
+td.pickcell{width:34px;padding-left:12px;padding-right:0}
+th.pickcell{cursor:default;width:34px;padding-right:0}
+.selbar{position:sticky;bottom:0;z-index:25;background:var(--ink);color:var(--panel);border-radius:10px;
+  margin:12px 0 0;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  box-shadow:0 -6px 24px -14px rgba(0,0,0,.5)}
+.selbar[hidden]{display:none!important}
+.selbar .n{font-weight:600;margin-right:4px}
+.selbar button{background:none;border:1px solid rgba(255,255,255,.3);color:var(--panel);border-radius:7px;
+  padding:6px 12px;cursor:pointer;font:inherit;font-size:13.5px}
+.selbar button:hover{background:rgba(255,255,255,.12)}
+.selbar button.primary{background:var(--panel);color:var(--ink);border-color:var(--panel);font-weight:500}
+.selbar button.primary:hover{opacity:.88}
+.selbar .sp{flex:1}
+.selbar .note{font-size:12.5px;opacity:.7}
+.pickall{background:none;border:0;color:var(--datum);cursor:pointer;font:inherit;font-size:13px;padding:0;text-decoration:underline;text-underline-offset:2px}
+.pickall+.pickall{margin-left:12px}
 
 /* ---------- grade + star ---------- */
 .grade{display:inline-block;font:600 12.5px/1.5 "Instrument Sans",sans-serif;padding:1px 7px;border-radius:4px;
@@ -302,7 +333,7 @@ footer b{color:var(--muted)}
 
   <section id="all">
     <h2>Search and filter</h2>
-    <p class="lede">Search one field or all of them, then narrow with the filters and sliders.</p>
+    <p class="lede">Search one field or all of them, then narrow with the filters and sliders. Tick bands here or on the cards above to build a list, then take it out as Excel, Word or CSV.</p>
     <div class="panel">
       <div class="searchrow">
         <select id="field" aria-label="Field to search"></select>
@@ -312,10 +343,20 @@ footer b{color:var(--muted)}
       <div class="filters" id="filters"></div>
     </div>
     <div class="resultbar">
-      <div class="count" id="count"></div>
+      <div class="count" id="count"> <button class="pickall" id="pickShown" type="button"></button><button class="pickall" id="pickNone" type="button" hidden>Clear selection</button></div>
       <div class="hint">Click a column heading to sort, or a row for the full record</div>
     </div>
     <div class="tablewrap"><table id="tbl"><thead></thead><tbody></tbody></table></div>
+    <div class="selbar" id="selbar" hidden role="region" aria-label="Selected bands">
+      <span class="n" id="selCount"></span>
+      <button class="primary" id="expXlsx" type="button">Download Excel</button>
+      <button id="expDoc" type="button">Download Word</button>
+      <button id="expCsv" type="button">CSV</button>
+      <button id="expCopy" type="button">Copy</button>
+      <span class="sp"></span>
+      <span class="note" id="selNote"></span>
+      <button id="selClear" type="button">Clear</button>
+    </div>
   </section>
 
   <footer id="foot"></footer>
@@ -515,7 +556,9 @@ function renderCohort(){
     const hasPitch=!!b.pitch;
     const ag=b.agency&&!/^Not (found|researched)/.test(b.agency)&&b.agency!=='\u2014';
     const lbl=b.label&&!/^(Not found|Not researched)/.test(b.label);
-    return `<button class="card ${gcls(b.grade).replace('g-','k-')}" data-name="${esc(b.name)}">
+    return `<div class="card ${gcls(b.grade).replace('g-','k-')}" data-name="${esc(b.name)}">
+      <label class="pick" title="Add to selection"><input type="checkbox" data-pick="${esc(b.name)}" ${SEL.has(b.name)?'checked':''} aria-label="Select ${esc(b.name)}"></label>
+      <button class="cardbody" data-open="${esc(b.name)}">
       <div class="hd"><h3>${esc(b.name)}</h3>
         <span class="grade ${gcls(b.grade)}">${esc(b.grade||'\u2014')}</span>${b.shortlisted?'<span class="star" title="Shortlisted by hand">\u2605</span>':''}</div>
       <div class="tags">${tags}</div>
@@ -526,10 +569,13 @@ function renderCohort(){
       </div>
       ${hasPitch?`<div class="pitch">${esc(b.pitch)}</div>`:''}
       <div class="agency${ag?'':' nf'}">${lbl?`${esc(b.label)}`:''}${lbl&&ag?' &middot; ':''}${ag?`<b>${esc(b.agency)}</b>`:(lbl?'':'Label and booking not looked up')}</div>
-    </button>`;}).join('') || '<div class="empty">No bands at this grade. Try another chip.</div>';
+      </button>
+    </div>`;}).join('') || '<div class="empty">No bands at this grade. Try another chip.</div>';
 }
 $('#gradeChips').addEventListener('click',e=>{const b=e.target.closest('.chip'); if(!b) return; cohortGrade=b.dataset.g; renderCohort();});
-$('#cohortGrid').addEventListener('click',e=>{const c=e.target.closest('.card'); if(c) openDetail(c.dataset.name);});
+$('#cohortGrid').addEventListener('click',e=>{
+  if(e.target.closest('.pick')) return;
+  const c=e.target.closest('.card'); if(c) openDetail(c.dataset.name);});
 
 // ---------- fields & filters ----------
 const FIELDS = [
@@ -630,21 +676,187 @@ function hl(text){
   const q=$('#q').value.trim(); if(!q) return esc(text);
   let s=esc(text); q.split(/\s+/).filter(t=>t.length>1).forEach(t=>{s=s.replace(new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'),'<mark>$1</mark>');}); return s;
 }
+// ---------- picking bands to export ----------
+const SELKEY='fs-sel';
+const SEL=new Set((()=>{try{return JSON.parse(sessionStorage.getItem(SELKEY)||'[]')}catch(e){return []}})());
+const saveSel=()=>{try{sessionStorage.setItem(SELKEY,JSON.stringify([...SEL]))}catch(e){}};
+const byName=n=>BANDS.find(b=>b.name===n);
+function selectedBands(){
+  // keep the table's current order; bands picked on another list stay selected but can't be ordered here
+  const here=currentList().filter(b=>SEL.has(b.name));
+  const names=new Set(here.map(b=>b.name));
+  const elsewhere=[...SEL].filter(n=>!names.has(n)).map(byName).filter(Boolean);
+  return here.concat(elsewhere);
+}
+function syncSel(){
+  const n=SEL.size, shown=currentList(), unpicked=shown.filter(b=>!SEL.has(b.name)).length;
+  $('#selbar').hidden = n===0;
+  $('#selCount').textContent = n===1?'1 band selected':`${fmt(n)} bands selected`;
+  const offlist = n - shown.filter(b=>SEL.has(b.name)).length;
+  $('#selNote').textContent = offlist>0?`${offlist} of them sit outside the current filters`:'';
+  $('#pickShown').textContent = shown.length? (unpicked? `Select these ${fmt(shown.length)}` : `Unselect these ${fmt(shown.length)}`) : '';
+  $('#pickShown').hidden = !shown.length;
+  $('#pickNone').hidden = n===0;
+}
 function renderTable(){
-  $('#tbl thead').innerHTML='<tr>'+COLS.map(([k,l])=>`<th data-k="${k}">${l}${k===sortKey?`<span class="arr">${sortDir>0?'↑':'↓'}</span>`:''}</th>`).join('')+'</tr>';
+  $('#tbl thead').innerHTML='<tr><th class="pickcell"></th>'+COLS.map(([k,l])=>`<th data-k="${k}">${l}${k===sortKey?`<span class="arr">${sortDir>0?'↑':'↓'}</span>`:''}</th>`).join('')+'</tr>';
   const list=currentList();
-  $('#count').textContent=`${fmt(list.length)} of ${fmt(BANDS.length)} bands`;
+  $('#count').firstChild.textContent=`${fmt(list.length)} of ${fmt(BANDS.length)} bands `;
   $('#tbl tbody').innerHTML = list.map(b=>`<tr data-name="${esc(b.name)}">
+    <td class="pickcell"><label class="pick" style="position:static"><input type="checkbox" data-pick="${esc(b.name)}" ${SEL.has(b.name)?'checked':''} aria-label="Select ${esc(b.name)}"></label></td>
     <td>${b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'<span class="muted">—</span>'}${b.shortlisted?' <span class="star" title="Hand-picked target">★</span>':''}</td>
     <td><b>${hl(b.name)}</b></td><td>${b.plays_count?hl(b.plays_2026.map(f=>f.replace(/ 2026$/,'')).join(' · ')):'<span class="muted">\u2014</span>'}</td><td>${hl(b.day)}</td><td>${hl(b.genre)}</td>
     <td class="n">${fmt(b.instagram_followers)}</td><td class="n">${fmt(b.spotify_listeners)}</td>
     <td class="n">${b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'\u00d7':'\u2014'}</td>
     <td class="n" title="${b.earnings_confidence?esc(b.earnings_confidence+' \u2014 '+(b.earnings_error_band||'')):''}">${b.est_income_top_member?'$'+short(b.est_income_top_member):'—'}</td>
     <td>${hl(b.label)}</td><td class="${/^Not /.test(b.agency||'')?'nf':''}">${hl(b.agency)}</td><td>${hl(b.agent)}</td></tr>`).join('')
-    || `<tr><td colspan="${COLS.length}" class="empty">Nothing matches those filters. Widen a slider or clear one.</td></tr>`;
+    || `<tr><td colspan="${COLS.length+1}" class="empty">Nothing matches those filters. Widen a slider or clear one.</td></tr>`;
+  syncSel();
 }
-$('#tbl thead').addEventListener('click',e=>{const th=e.target.closest('th'); if(!th)return; const k=th.dataset.k; if(sortKey===k)sortDir*=-1; else{sortKey=k;sortDir=(k.includes('followers')||k.includes('listeners')||k.includes('size'))?-1:1;} renderTable();});
-$('#tbl tbody').addEventListener('click',e=>{const tr=e.target.closest('tr[data-name]'); if(tr) openDetail(tr.dataset.name);});
+$('#tbl thead').addEventListener('click',e=>{const th=e.target.closest('th'); if(!th||!th.dataset.k)return; const k=th.dataset.k; if(sortKey===k)sortDir*=-1; else{sortKey=k;sortDir=(k.includes('followers')||k.includes('listeners')||k.includes('size'))?-1:1;} renderTable();});
+$('#tbl tbody').addEventListener('click',e=>{
+  if(e.target.closest('.pick')) return;
+  const tr=e.target.closest('tr[data-name]'); if(tr) openDetail(tr.dataset.name);});
+document.addEventListener('change',e=>{
+  const cb=e.target.closest('input[data-pick]'); if(!cb) return;
+  const nm=cb.dataset.pick;
+  if(cb.checked) SEL.add(nm); else SEL.delete(nm);
+  saveSel();
+  document.querySelectorAll(`input[data-pick="${CSS.escape(nm)}"]`).forEach(x=>{x.checked=cb.checked;});
+  syncSel();
+});
+$('#pickShown').addEventListener('click',()=>{
+  const shown=currentList(), unpicked=shown.filter(b=>!SEL.has(b.name));
+  if(unpicked.length) unpicked.forEach(b=>SEL.add(b.name)); else shown.forEach(b=>SEL.delete(b.name));
+  saveSel(); renderTable(); renderCohort();
+});
+$('#pickNone').addEventListener('click',()=>{SEL.clear();saveSel();renderTable();renderCohort();});
+$('#selClear').addEventListener('click',()=>{SEL.clear();saveSel();renderTable();renderCohort();});
+
+// ---------- exporting a picked list ----------
+const EXPORT_COLS=[
+ ['Grade','grade'],['Band','name'],['Shortlisted',b=>b.shortlisted?'Yes':''],
+ ['Plays in 2026',b=>(b.plays_2026||[]).join(' / ')],['Day','day'],['Genre','genre'],['Hometown','hometown'],
+ ['Instagram followers','instagram_followers'],['Instagram handle','instagram_handle'],
+ ['Spotify monthly listeners','spotify_listeners'],
+ ['Size vs Sincere Engineer','size_vs_sincere_engineer'],
+ ['Record label','label'],['Booking agency','agency'],['Booking agent','agent'],
+ ['Est. member earnings (modelled)','est_income_top_member'],['Earnings confidence','earnings_confidence'],
+ ['Why this grade','grade_basis'],['Why shortlisted','pitch'],
+ ['Instagram URL','instagram_url'],['Spotify URL','spotify_url'],['Tracked on','festival'],['Flags','flags'],
+];
+const cellOf=(b,src)=>{const v=typeof src==='function'?src(b):b[src];return (v==null||v==='')?'':v;};
+const stamp=()=>new Date().toISOString().slice(0,10);
+const fileBase=()=>`band-scouting-${stamp()}`;
+function download(blob,name){
+  const u=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(u),2000);
+}
+function busy(btn,txt,fn){
+  const was=btn.textContent; btn.disabled=true; btn.textContent=txt;
+  Promise.resolve().then(fn).catch(e=>{console.error(e);alert('That export failed: '+e.message);})
+    .finally(()=>{btn.disabled=false;btn.textContent=was;});
+}
+function rowsFor(bands){
+  return [EXPORT_COLS.map(c=>c[0])].concat(bands.map(b=>EXPORT_COLS.map(c=>cellOf(b,c[1]))));
+}
+// --- CSV (Excel opens it straight away; BOM keeps accents intact) ---
+function toCSV(bands){
+  const esc=v=>{const t=String(v); return /[",\n]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t;};
+  return '﻿'+rowsFor(bands).map(r=>r.map(esc).join(',')).join('\r\n');
+}
+$('#expCsv').addEventListener('click',e=>busy(e.target,'Saving…',()=>{
+  download(new Blob([toCSV(selectedBands())],{type:'text/csv;charset=utf-8'}),fileBase()+'.csv');
+}));
+// --- real .xlsx, with the sheet set up to work in ---
+let xlsxLib=null;
+function loadXLSX(){
+  if(xlsxLib) return Promise.resolve(xlsxLib);
+  if(window.XLSX){xlsxLib=window.XLSX;return Promise.resolve(xlsxLib);}
+  return new Promise((res,rej)=>{
+    const sc=document.createElement('script');
+    sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    sc.onload=()=>{xlsxLib=window.XLSX;res(xlsxLib);};
+    sc.onerror=()=>rej(new Error('couldn’t reach the spreadsheet library'));
+    document.head.appendChild(sc);
+  });
+}
+$('#expXlsx').addEventListener('click',e=>busy(e.target,'Building…',()=>
+  loadXLSX().then(X=>{
+    const bands=selectedBands(), rows=rowsFor(bands);
+    const ws=X.utils.aoa_to_sheet(rows);
+    ws['!cols']=[8,28,11,24,14,24,20,13,18,14,12,26,26,22,15,18,56,70,34,44,24,40].map(w=>({wch:w}));
+    ws['!autofilter']={ref:X.utils.encode_range({s:{r:0,c:0},e:{r:rows.length-1,c:EXPORT_COLS.length-1}})};
+    // number formats, so the sheet is usable the moment it opens
+    const NF={7:'#,##0',9:'#,##0',10:'0.00"\u00d7"',14:'$#,##0'};
+    for(let r=1;r<rows.length;r++) for(const c in NF){
+      const ref=X.utils.encode_cell({r:r,c:+c}), cell=ws[ref];
+      if(cell&&cell.t==='n') cell.z=NF[c];
+    }
+    const wb=X.utils.book_new();
+    X.utils.book_append_sheet(wb,ws,'Bands');
+    const notes=[['Band scouting export'],[],
+      ['Exported',new Date().toLocaleString()],
+      ['Bands',bands.length],
+      ['Benchmark',`${BM.name} — ${fmt(BM.instagram)} Instagram followers, ${fmt(BM.spotify)} Spotify monthly listeners`],
+      ['Size vs Sincere Engineer','√((Instagram ÷ 42,256) × (Spotify ÷ 76,852)). 1.00 = the same draw.'],
+      ['Grade','That size index crossed with how close the band’s genre sits to Sulynn Hago’s.'],
+      ['Shortlisted','Picked by hand as a support-slot target, with a written reason in the sheet.'],
+      ['Est. member earnings','MODELLED estimates from the supplied punk/indie earnings ranking, not reported or audited figures. The source states ±40% error bars for ranks 1–300 and ±60% for 301–803; ranks 804–1000 describe a position in the scene economy rather than a real individual.'],
+      ['Instagram','Social Blade, cross-checked against HypeAuditor.'],
+      ['Spotify','Monthly listeners read from each artist’s own Spotify page.'],
+    ];
+    const ns=X.utils.aoa_to_sheet(notes); ns['!cols']=[{wch:24},{wch:110}];
+    X.utils.book_append_sheet(wb,ns,'About this export');
+    X.writeFile(wb,fileBase()+'.xlsx');
+  })
+));
+// --- Word: a briefing to read, not a grid to calculate in ---
+function toDoc(bands){
+  const e=v=>String(v==null?'':v).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const line=(k,v)=>v?`<p style="margin:0 0 2pt"><span style="color:#5e6975">${k}: </span>${e(v)}</p>`:'';
+  const byGrade={}; bands.forEach(b=>{(byGrade[b.grade||'Not graded']=byGrade[b.grade||'Not graded']||[]).push(b);});
+  const order=['A+','A','A-','B','C','D','Not graded'].filter(g=>byGrade[g]);
+  const body=order.map(g=>`<h2 style="font:bold 13pt Calibri,sans-serif;margin:18pt 0 6pt;border-bottom:1pt solid #cfd7df;padding-bottom:3pt">Grade ${e(g)} &mdash; ${byGrade[g].length} band${byGrade[g].length>1?'s':''}</h2>`+
+    byGrade[g].map(b=>`<div style="margin:0 0 12pt">
+      <p style="margin:0 0 3pt"><b style="font-size:12pt">${e(b.name)}</b>${b.shortlisted?' <span style="color:#b31a57">&#9733; shortlisted</span>':''}</p>
+      ${line('Size vs Sincere Engineer', b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'×':'')}
+      ${line('Audience', [b.instagram_followers?fmt(b.instagram_followers)+' Instagram':'',b.spotify_listeners?fmt(b.spotify_listeners)+' Spotify monthly':''].filter(Boolean).join(' · '))}
+      ${line('Genre', b.genre)}
+      ${line('Plays in 2026', (b.plays_2026||[]).join(', '))}
+      ${line('Label', /^Not /.test(b.label||'')?'':b.label)}
+      ${line('Booking', /^Not /.test(b.agency||'')?'':[b.agency,b.agent&&b.agent!=='—'?b.agent:''].filter(Boolean).join(' — '))}
+      ${b.pitch?`<p style="margin:4pt 0 0">${e(b.pitch)}</p>`:(b.grade_basis?`<p style="margin:4pt 0 0;color:#5e6975">${e(b.grade_basis)}</p>`:'')}
+    </div>`).join('')).join('');
+  return `<!doctype html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8">
+    <title>Band scouting</title></head>
+    <body style="font:11pt Calibri,sans-serif;color:#171b20">
+    <h1 style="font:bold 18pt Calibri,sans-serif;margin:0 0 2pt">Band scouting</h1>
+    <p style="margin:0 0 14pt;color:#5e6975">${bands.length} band${bands.length>1?'s':''} &middot; ${new Date().toLocaleDateString()} &middot; sized against ${e(BM.name)} (${fmt(BM.instagram)} Instagram, ${fmt(BM.spotify)} Spotify monthly)</p>
+    ${body}
+    <p style="margin:20pt 0 0;font-size:8.5pt;color:#5e6975">Size index = &#8730;((Instagram &divide; 42,256) &times; (Spotify &divide; 76,852)); 1.00 is the same draw as ${e(BM.name)}. Any earnings figures elsewhere in this project are modelled estimates, not reported income.</p>
+    </body></html>`;
+}
+$('#expDoc').addEventListener('click',e=>busy(e.target,'Saving…',()=>{
+  download(new Blob(['﻿'+toDoc(selectedBands())],{type:'application/msword'}),fileBase()+'.doc');
+}));
+// --- clipboard: rich for Word/email, plain as the fallback ---
+$('#expCopy').addEventListener('click',e=>busy(e.target,'Copying…',()=>{
+  const bands=selectedBands(), rows=rowsFor(bands);
+  const plain=rows.map(r=>r.join('\t')).join('\n');
+  const esc2=v=>String(v).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const html='<table border="1" style="border-collapse:collapse;font:10pt Calibri,sans-serif"><tr>'+
+    rows[0].map(h=>`<th style="background:#eceff3;padding:4px 6px;text-align:left">${esc2(h)}</th>`).join('')+'</tr>'+
+    rows.slice(1).map(r=>'<tr>'+r.map(c=>`<td style="padding:4px 6px">${esc2(c)}</td>`).join('')+'</tr>').join('')+'</table>';
+  const done=()=>{const n=$('#selNote'); const was=n.textContent; n.textContent='Copied — paste into Word, Excel or an email'; setTimeout(()=>{n.textContent=was;},2600);};
+  if(navigator.clipboard&&window.ClipboardItem){
+    return navigator.clipboard.write([new ClipboardItem({
+      'text/html':new Blob([html],{type:'text/html'}),
+      'text/plain':new Blob([plain],{type:'text/plain'})})]).then(done);
+  }
+  return navigator.clipboard.writeText(plain).then(done);
+}));
 ['#q','#field'].forEach(s=>$(s).addEventListener('input',renderTable));
 $('#filters').addEventListener('input',renderTable);
 $('#reset').addEventListener('click',()=>{$('#q').value='';$('#field').value='_all';

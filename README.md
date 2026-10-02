@@ -36,6 +36,18 @@ Instagram followers, Spotify monthly listeners, size index and estimated earning
 ## Estimated earnings
 The earnings columns come from a supplied punk/indie earnings ranking workbook and are **modeled estimates, not reported or audited figures**. The source derives each from touring tier, venue capacity, catalog ownership, songwriting splits and label structure, and states error bars of ±40% for ranks 1–300 and ±60% for 301–803; ranks 804–1000 are "cohort positions" describing a place in the scene economy rather than a real individual. The workbook ranks **people**, not bands, so a band may contribute several rows: `est_income_top_member` is the highest single estimate and `est_income_members_sum` adds only the members the workbook lists. Every detail view carries the caveat and the per-member breakdown; the table column is asterisked.
 
+## Building an export
+Tick bands on the cards or in the table. The tick travels with the band, so a selection survives switching lists and filtering; the bar at the foot of the table says how many of the picked bands are currently hidden by filters. **Select these N** takes everything the current filters show.
+
+| Button | What you get |
+|---|---|
+| Download Excel | A real `.xlsx` — 22 columns, autofilter on, thousands separators and `0.00×` already applied, plus an **About this export** sheet recording the benchmark, how the grade is derived, and the earnings caveat. SheetJS is loaded from cdnjs on first use. |
+| Download Word | A briefing to read rather than a grid to calculate in: grouped by grade, one block per band with the audience figures, label, booking and the written pitch. Opens in Word as a `.doc`. |
+| CSV | Same columns as the Excel sheet, UTF-8 with a BOM so Excel keeps the accents. No dependency — this is the fallback if cdnjs is unreachable. |
+| Copy | Puts the table on the clipboard as both rich HTML and tab-separated text, so it pastes as a formatted table into Word or email and as cells into Excel. |
+
+Selections live in `sessionStorage` and clear when the tab closes.
+
 ## Adding a dataset
 1. Put the plaintext dataset at `private/<id>.json` — same shape as the existing ones:
    `{label, title, kicker, subtitle, cohortLede, generated, benchmark, examples[], notes, bands[]}`.
