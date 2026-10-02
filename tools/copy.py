@@ -27,9 +27,24 @@ COPY = {
    where='<b>Follow list</b> — 746 bands drawn from the punk and indie earnings ranking. Not on any 2026 bill we track, but worth knowing.',
    subtitle="746 bands, each placed against Sincere Engineer's draw. Earnings here are modelled estimates, not reported figures."),
 }
+# Written notes that belong to a specific record and must survive a rebuild.
+PITCH = {
+ 'Sincere Engineer': ("The benchmark the whole scale is built on, and a real target: Sulynn has already "
+    "played direct support for her. She is on the Riot Fest bill, so an approach there is warm rather than cold."),
+}
+
 for fid, c in COPY.items():
     p = os.path.join(root, 'private', fid + '.json')
     d = json.load(open(p, encoding='utf-8'))
     d.update(c); d['cohortLede'] = LEDE
+    for b in d.get('bands', []):
+        if b.get('name') in PITCH and not b.get('pitch'):
+            b['pitch'] = PITCH[b['name']]
+            b['shortlisted'] = b.get('shortlisted') or 'Yes \u2014 hand-picked target'
+            b['shortlist_tier'] = b.get('shortlist_tier') or 'A+'
     json.dump(d, open(p, 'w', encoding='utf-8'), indent=1, ensure_ascii=False)
     print('copy applied to', fid)
+
+# anything deliberately removed has to survive a rebuild too
+import subprocess, sys
+subprocess.run([sys.executable, os.path.join(root, 'tools', 'redact.py')], check=True)
