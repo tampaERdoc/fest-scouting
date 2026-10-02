@@ -8,13 +8,30 @@ Data files are encrypted (AES-256-GCM, key derived with PBKDF2-SHA256, 310k iter
 | Toggle | Encrypted data file | Acts |
 |---|---|---|
 | Warped Tour 2026 (Orlando, Nov 14–15) | `data/warped-2026.enc.js` | 143 |
+| Riot Fest 2026 (Douglass Park, Chicago, Sept 18–20) | `data/riot-2026.enc.js` | 106 |
 | Fest 2026 / FEST 24 (Gainesville, Oct 23–25) | `data/fest-2026.enc.js` | 334 |
-| Watchlist (bands to follow, not on either bill) | `data/watchlist-2026.enc.js` | 746 |
-| All Bands | *(virtual — merges every loaded dataset)* | 1,223 |
+| Watchlist (bands to follow, from the earnings ranking) | `data/watchlist-2026.enc.js` | 746 |
+| All Bands | *(virtual — merges every loaded dataset)* | 1,280 distinct |
 
-The **All Bands** toggle appears automatically once two or more datasets are present. It adds a "Source list" column and filter, so you can list every A+ band across all three lists, or every band on one label.
+The **All Bands** toggle appears automatically once two or more datasets are present. A band tracked on more than one list has a record on each; the combined view merges them into one row, keeping the most complete record and listing every source, so 1,329 records become 1,280 distinct bands.
 
-`#warped-2026`, `#fest-2026`, `#watchlist-2026` and `#all` are deep-linkable.
+Every record also carries **`plays_2026`** — which of the three 2026 bills that band actually plays, cross-referenced by name across all four datasets. 23 bands play more than one. It is a table column, a filter, and an ask-the-data phrase ("bands on more than one 2026 bill").
+
+`#warped-2026`, `#riot-2026`, `#fest-2026`, `#watchlist-2026` and `#all` are deep-linkable.
+
+## The Sincere Engineer grade
+Every band with both an Instagram and a Spotify figure is graded on one scale:
+
+- **Size index** = √((IG ÷ 42,256) × (Spotify ÷ 76,852)). **1.00 = the same draw as Sincere Engineer.** The index is turned into a weight that is 1.00 inside 0.80–1.25× and falls off from there.
+- **Genre fit** scores how close the band's style is to Sulynn Hago's lane, from 1.00 (pop-punk, emo, melodic punk, power pop) down to 0.00 (hip-hop, pop, dance). The *first* tag is the band's primary style and carries the weight; a strong secondary tag can lift the score but not carry it, so "Mariachi / Punk" does not score as a punk band.
+- **Grade** = weight × fit → A+ ≥ 0.85, A ≥ 0.65, A- ≥ 0.45, B ≥ 0.28, C ≥ 0.12, D below. Sincere Engineer herself lands at 1.00× and A+, which is the check that the scale is anchored.
+
+`grade_basis` on each record states the arithmetic in words. Bands missing either figure are left ungraded rather than guessed at.
+
+Separately, **`shortlisted`** marks the bands hand-picked as support-slot targets, with the written pitch angle in `pitch` and the original hand tier in `shortlist_tier`. Those carry a ★ and have their own chip and filter — the computed grade measures size and style, the shortlist adds judgement about reachability and the way in.
+
+## Filtering
+Instagram followers, Spotify monthly listeners, size index and estimated earnings are dual-handle **log-scale range sliders**. Booking agency, record label, genre and hometown are type-to-search boxes that accept a partial match (typing "epitaph" matches every Epitaph imprint). Everything else is a dropdown, and the plain-English ask box writes to the same filters.
 
 ## Estimated earnings
 The earnings columns come from a supplied punk/indie earnings ranking workbook and are **modeled estimates, not reported or audited figures**. The source derives each from touring tier, venue capacity, catalog ownership, songwriting splits and label structure, and states error bars of ±40% for ranks 1–300 and ±60% for 301–803; ranks 804–1000 are "cohort positions" describing a place in the scene economy rather than a real individual. The workbook ranks **people**, not bands, so a band may contribute several rows: `est_income_top_member` is the highest single estimate and `est_income_members_sum` adds only the members the workbook lists. Every detail view carries the caveat and the per-member breakdown; the table column is asterisked.
@@ -23,17 +40,19 @@ The earnings columns come from a supplied punk/indie earnings ranking workbook a
 1. Put the plaintext dataset at `private/<id>.json` — same shape as the existing ones:
    `{label, title, kicker, subtitle, cohortLede, generated, benchmark, examples[], notes, bands[]}`.
    Each band:
-   `name, entity_type, grade, pitch, genre, genre_source, day, hometown, status, instagram_handle,
+   `name, entity_type, grade, grade_score, grade_basis, shortlisted, shortlist_tier, pitch, genre, genre_source,
+   plays_2026[], plays_2026_text, plays_count, day, hometown, status, instagram_handle,
    instagram_followers, instagram_source, ig_socialblade, ig_hypeauditor, ig_hypeauditor_date, instagram_url,
    spotify_listeners, spotify_followers, spotify_url, spotify_name, spotify_verification,
    size_vs_sincere_engineer, label, label_note, label_source, agency, agent, booking_notes, booking_evidence,
-   booking_source, flags, earnings_rank, est_income_top_member, est_income_members_sum, earnings_confidence,
+   booking_source, flags, poster_row, predicted_set_time, earnings_rank, est_income_top_member, est_income_members_sum, earnings_confidence,
    earnings_error_band, earnings_members[], earnings_caveat, earnings_source, follower_source_date, watchlist`
    Numeric fields must be `null` (not `""`) when unknown, or range filters will treat them as zero.
    (`private/` is git-ignored and never pushed.)
 2. `python3 tools/encrypt.py <id> "<the same password>"` → writes `data/<id>.enc.js`.
 3. Add `{id:'<id>', label:'…'}` to `FEST_REGISTRY` near the top of the script in `index.html`.
 4. Commit and push `data/<id>.enc.js`.
+5. Re-run the cross-reference so the new bands pick up their 2026 festival flags and grades.
 
 Filter options are derived from the data, so new labels, agencies, genres and record types appear on their own. Any filter with more than 25 options renders as a type-to-search box instead of a dropdown.
 
