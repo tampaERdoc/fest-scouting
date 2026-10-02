@@ -3,181 +3,295 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Festival Scouting</title>
+<title>Band Scouting — support-slot targets measured against Sincere Engineer</title>
+<meta name="description" content="A scouting database of 1,280 bands across Warped Tour 2026, Riot Fest 2026, Fest 2026 and a follow list, each measured against Sincere Engineer's draw.">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f6f1e7; --paper:#fffdf8; --ink:#16130f; --muted:#6b6358; --line:#e3dac9;
-  --accent:#e8551c; --accent-ink:#fff; --soft:#fbe7dc;
-  --aplus:#0f7a4a; --a:#3d9a5f; --aminus:#8aa83a; --b:#8b8478;
-  --warn:#b45309; --bad:#b91c1c; --chip:#efe7d8; --mark:#ffd9a8; --flagbg:#fff4e5; --flagfg:#7a3e00; --shadow:0 1px 0 rgba(0,0,0,.04),0 6px 20px -12px rgba(0,0,0,.25);
+  --field:#e9edf1; --panel:#ffffff; --sunk:#f3f6f8;
+  --ink:#171b20; --body:#2d343c; --muted:#5e6975; --faint:#8894a1;
+  --rule:#cfd7df; --hair:#e2e8ed;
+  --datum:#0d6a73; --datum-soft:#d9ecee;
+  --mark:#b31a57; --mark-soft:#fbe4ed;
+  --aplus:#0d6a73; --a:#3c8a74; --aminus:#6f8f5a; --b:#8a8d7e; --c:#9aa3ac; --d:#b7bfc7;
+  --warn:#8a5a10; --warnbg:#fdf3e2; --bad:#a11b2c;
+  --focus:#0d6a73;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#14120f; --paper:#1d1a16; --ink:#f3ede2; --muted:#a59b8c; --line:#352f27;
-    --accent:#ff6a2b; --soft:#3a2418; --chip:#2a251f; --b:#9a9284; --aminus:#a3c24b; --mark:#7a4a10; --flagbg:#3a2a12; --flagfg:#ffd9a8; --bad:#f87171; color-scheme:dark;
-  }
-}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --field:#11151a; --panel:#1a1f26; --sunk:#151a20;
+  --ink:#eef2f6; --body:#d2dae2; --muted:#9aa6b2; --faint:#73818f;
+  --rule:#2e3741; --hair:#252d36;
+  --datum:#49b3bd; --datum-soft:#133236;
+  --mark:#f0719f; --mark-soft:#38131f;
+  --aplus:#49b3bd; --a:#5fb496; --aminus:#9ab96f; --b:#9a9d8e; --c:#78828d; --d:#5b646e;
+  --warn:#e2b36a; --warnbg:#2f2413; --bad:#f08a95; --focus:#49b3bd;
+  color-scheme:dark;
+}}
 :root[data-theme="dark"]{
-  --bg:#14120f; --paper:#1d1a16; --ink:#f3ede2; --muted:#a59b8c; --line:#352f27;
-  --accent:#ff6a2b; --soft:#3a2418; --chip:#2a251f; --b:#9a9284; --aminus:#a3c24b; --mark:#7a4a10; --flagbg:#3a2a12; --flagfg:#ffd9a8; --bad:#f87171; color-scheme:dark;
+  --field:#11151a; --panel:#1a1f26; --sunk:#151a20;
+  --ink:#eef2f6; --body:#d2dae2; --muted:#9aa6b2; --faint:#73818f;
+  --rule:#2e3741; --hair:#252d36;
+  --datum:#49b3bd; --datum-soft:#133236; --mark:#f0719f; --mark-soft:#38131f;
+  --aplus:#49b3bd; --a:#5fb496; --aminus:#9ab96f; --b:#9a9d8e; --c:#78828d; --d:#5b646e;
+  --warn:#e2b36a; --warnbg:#2f2413; --bad:#f08a95; --focus:#49b3bd; color-scheme:dark;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Archivo,system-ui,sans-serif}
-a{color:inherit}
-.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
-.festbar{background:var(--ink);color:var(--paper)}
-.festbar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px;flex-wrap:wrap}
-.festlabel{font:600 11px JetBrains Mono,monospace;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
-.festtoggle{display:flex;gap:6px;flex-wrap:wrap}
-.festtoggle button{font:700 13px Archivo;border:1.5px solid var(--paper);background:transparent;color:var(--paper);border-radius:999px;padding:5px 14px;cursor:pointer}
-.festtoggle button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.festtoggle button:disabled{opacity:.45;cursor:not-allowed;border-style:dashed}
-.festtoggle button small{font:500 10.5px JetBrains Mono,monospace;margin-left:6px;opacity:.8}
-.lock{min-height:70vh;display:flex;align-items:center;justify-content:center;padding-block:40px}
-.lockbox{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:12px;padding:28px 24px;width:min(420px,100%);box-shadow:var(--shadow)}
-.lockbox h1{font-size:34px;margin:6px 0 8px}
-.lockbox form{display:flex;flex-direction:column;gap:10px;margin-top:14px}
-.lockerr{color:var(--bad);font-size:13.5px;min-height:1.2em}
-.app[hidden]{display:none!important}
-header.top{border-bottom:3px solid var(--ink);background:var(--paper)}
-header.top .wrap{display:flex;gap:24px;align-items:flex-end;justify-content:space-between;padding-top:28px;padding-bottom:20px;flex-wrap:wrap}
-.kicker{font:600 12px/1 JetBrains Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
-h1{text-wrap:balance;font:400 clamp(30px,5vw,54px)/.95 "Archivo Black",sans-serif;margin:8px 0 6px;letter-spacing:-.01em}
-.sub{color:var(--muted);max-width:640px}
-.stats{display:flex;gap:18px;flex-wrap:wrap}
-.stat{min-width:96px}
-.stat b{display:block;font:400 26px/1 "Archivo Black";}
-.stat span{font-size:12px;color:var(--muted)}
-.bench{margin-top:10px;font-size:13px;color:var(--muted)}
-.bench b{color:var(--ink)}
-section{padding:28px 0 8px}
-h2{font:400 24px/1.1 "Archivo Black";margin:0 0 4px;text-transform:uppercase;letter-spacing:.01em}
-h2 .tag{font:600 11px JetBrains Mono,monospace;background:var(--ink);color:var(--paper);padding:3px 7px;border-radius:3px;vertical-align:middle;margin-left:8px;letter-spacing:.08em}
-.lede{color:var(--muted);margin:0 0 16px;max-width:780px}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.chip{border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:600 14px Archivo;padding:6px 14px;border-radius:999px;cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-.chip small{font:500 11px JetBrains Mono,monospace;opacity:.7;margin-left:6px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
-.card{display:flex;flex-direction:column;justify-content:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 14px 12px;cursor:pointer;box-shadow:var(--shadow);text-align:left;color:inherit;font:inherit;transition:transform .12s ease,border-color .12s}
-.card:hover,.card:focus-visible{transform:translateY(-2px);border-color:var(--ink);outline:none}
-.card h3{margin:6px 0 2px;font:700 18px/1.2 Archivo}
-.card .meta{font-size:12.5px;color:var(--muted)}
-.card .nums{display:flex;gap:14px;margin:10px 0 8px;font:600 13px JetBrains Mono,monospace}
-.card .nums span{display:block;font:500 10.5px Archivo;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.card .pitch{font-size:13px;border-top:1px dashed var(--line);padding-top:8px}
-.card .agency{font-size:12.5px;margin-top:6px}
-.grade{display:inline-block;font:700 12px JetBrains Mono,monospace;padding:2px 8px;border-radius:4px;color:#fff;min-width:30px;text-align:center}
-.g-Aplus{background:var(--aplus)} .g-A{background:var(--a)} .g-Aminus{background:var(--aminus)} .g-B{background:var(--b)} .g-none{background:transparent;color:var(--muted);border:1px solid var(--line)}
-.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+html,body{margin:0;background:var(--field);color:var(--body);
+  font:400 15.5px/1.55 "Instrument Sans",system-ui,-apple-system,sans-serif;
+  font-variant-numeric:tabular-nums;}
+body{overflow-x:hidden}
+a{color:var(--datum);text-underline-offset:2px}
+h1,h2,h3{color:var(--ink);margin:0;font-weight:600;letter-spacing:-.016em}
+.num{font-variant-numeric:tabular-nums}
+.wrap{width:min(1300px,100% - 40px);margin-inline:auto}
+:where(a,button,input,select,summary,[tabindex]):focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:3px}
+
+/* ---------- gate ---------- */
+.gate{min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;padding-block:clamp(56px,16vh,150px) 28px}
+.gate .wrap{width:min(560px,100% - 40px)}
+.gate h1{font:400 clamp(34px,6vw,54px)/1.05 "Newsreader",Georgia,serif;letter-spacing:-.02em;margin-bottom:14px}
+.gate p{color:var(--muted);max-width:46ch;margin:0 0 26px}
+.gate form{display:flex;gap:8px;flex-wrap:wrap}
+.gate input{flex:1 1 220px}
+.gate .foot{color:var(--faint);font-size:13px}
+.lockerr{flex-basis:100%;color:var(--bad);font-size:13.5px;min-height:1.3em;margin-top:2px}
+.rule-datum{height:2px;background:var(--rule);position:relative;margin:0 0 26px}
+.rule-datum::after{content:"";position:absolute;left:38%;top:-5px;width:2px;height:12px;background:var(--datum)}
+
+/* ---------- masthead ---------- */
+.mast{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--rule)}
+.mast .wrap{display:flex;align-items:center;gap:18px;min-height:56px;flex-wrap:wrap;padding-block:8px}
+.mast .name{font:600 16px/1 "Instrument Sans",sans-serif;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
+.tabs{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.tabs button{appearance:none;background:none;border:0;border-radius:6px;cursor:pointer;color:var(--muted);
+  font:500 14px "Instrument Sans",sans-serif;padding:7px 11px;display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap}
+.tabs button:hover:not(:disabled){background:var(--sunk);color:var(--ink)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--panel)}
+.tabs button[aria-selected="true"] small{color:var(--panel);opacity:.62}
+.tabs button:disabled{opacity:.42;cursor:default}
+.tabs small{font-size:12px;color:var(--faint)}
+
+/* ---------- hero ---------- */
+.hero{background:var(--panel);border-bottom:1px solid var(--rule)}
+.hero .wrap{padding-block:clamp(26px,5vw,48px) 0}
+.hero h1{font:400 clamp(30px,4.6vw,46px)/1.08 "Newsreader",Georgia,serif;letter-spacing:-.018em;max-width:19ch;text-wrap:balance}
+.hero .sub{margin:14px 0 0;max-width:62ch;color:var(--body);font-size:16px}
+.hero .where{margin:10px 0 0;color:var(--muted);font-size:14px;max-width:70ch}
+.hero .where b{font-weight:600;color:var(--body)}
+.counts{display:flex;flex-wrap:wrap;gap:4px 22px;margin:20px 0 0;padding:0;list-style:none;color:var(--muted);font-size:14.5px}
+.counts b{font-weight:600;color:var(--ink)}
+
+/* ---------- the calibration scale ---------- */
+.scale{margin:34px 0 0;padding:26px 0 26px}
+.scale .plot{position:relative;height:96px;border-bottom:1px solid var(--rule)}
+.scale .axis{position:absolute;inset:auto 0 0;height:1px}
+.scale .tickmark{position:absolute;bottom:0;width:1px;height:7px;background:var(--rule)}
+.scale .tlabel{position:absolute;bottom:-21px;transform:translateX(-50%);font-size:12px;color:var(--faint);white-space:nowrap}
+.scale .band{position:absolute;bottom:8px;width:2px;border-radius:1px;background:var(--c);opacity:.5}
+.scale .band.g1{background:var(--aplus);opacity:.95}
+.scale .band.g2{background:var(--a);opacity:.85}
+.scale .band.g3{background:var(--aminus);opacity:.7}
+.scale .datum{position:absolute;bottom:0;top:0;width:2px;background:var(--datum)}
+.scale .datum::after{content:"";position:absolute;top:-4px;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--datum)}
+.scale .dlabel{position:absolute;top:-34px;transform:translateX(-50%);white-space:nowrap;text-align:center}
+.scale .dlabel b{display:block;font:600 13px "Instrument Sans",sans-serif;color:var(--datum)}
+.scale .dlabel span{display:block;font-size:11.5px;color:var(--muted)}
+.scale .caption{margin:30px 0 0;font-size:13px;color:var(--muted);max-width:74ch}
+
+/* ---------- sections ---------- */
+main{padding-bottom:64px}
+section{padding-top:clamp(30px,4vw,52px);scroll-margin-top:68px}
+section > h2{font:600 clamp(19px,2.3vw,24px)/1.2 "Instrument Sans",sans-serif;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+section > h2 .of{font-weight:400;color:var(--faint);font-size:15px}
+.lede{color:var(--muted);margin:8px 0 18px;max-width:68ch;font-size:14.5px}
+
+/* ---------- chips ---------- */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.chip{border:1px solid var(--rule);background:var(--panel);color:var(--body);
+  font:500 14px "Instrument Sans",sans-serif;padding:6px 13px;border-radius:999px;cursor:pointer;
+  display:inline-flex;align-items:baseline;gap:7px}
+.chip:hover{border-color:var(--muted)}
+.chip small{font-size:12px;color:var(--faint)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.chip[aria-pressed="true"] small{color:var(--panel);opacity:.6}
+
+/* ---------- cohort cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(282px,1fr));gap:1px;background:var(--hair);
+  border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+.card{background:var(--panel);border:0;border-left:3px solid var(--rule);padding:15px 16px 16px;cursor:pointer;
+  text-align:left;color:inherit;font:inherit;display:flex;flex-direction:column;gap:9px}
+.card:hover,.card:focus-visible{background:var(--sunk);outline:none}
+.card.k-Aplus{border-left-color:var(--aplus)} .card.k-A{border-left-color:var(--a)}
+.card.k-Aminus{border-left-color:var(--aminus)} .card.k-B{border-left-color:var(--b)}
+.card.k-C{border-left-color:var(--c)} .card.k-D,.card.k-none{border-left-color:var(--hair)}
+.card .hd{display:flex;align-items:baseline;gap:8px}
+.card h3{font:600 17.5px/1.25 "Instrument Sans",sans-serif;flex:1}
+.card .tags{display:flex;flex-wrap:wrap;gap:4px}
+.tagpill{font-size:11.5px;line-height:1.5;color:var(--muted);background:var(--sunk);border-radius:4px;padding:1px 6px;white-space:nowrap}
+.tagpill.play{color:var(--datum);background:var(--datum-soft)}
+.nums{display:flex;gap:18px;flex-wrap:wrap;border-block:1px solid var(--hair);padding-block:8px}
+.nums div{min-width:0}
+.nums b{display:block;font:600 14.5px/1.25 "Instrument Sans",sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.nums span{display:block;font-size:11.5px;color:var(--faint)}
+.card .pitch{font:400 14px/1.5 "Newsreader",Georgia,serif;color:var(--body)}
+.card .pitch.auto{font-family:"Instrument Sans",sans-serif;font-size:13px;color:var(--muted)}
+.card .agency{font-size:12.5px;color:var(--muted);margin-top:auto;padding-top:4px;border-top:1px solid var(--hair)}
+.card .agency b{color:var(--body);font-weight:600}
+.card .agency.nf{color:var(--faint)}
+
+/* ---------- grade + star ---------- */
+.grade{display:inline-block;font:600 12.5px/1.5 "Instrument Sans",sans-serif;padding:1px 7px;border-radius:4px;
+  color:#fff;min-width:26px;text-align:center;font-variant-numeric:tabular-nums}
+.g-Aplus{background:var(--aplus)} .g-A{background:var(--a)} .g-Aminus{background:var(--aminus)}
+.g-B{background:var(--b)} .g-C{background:var(--c)} .g-none{background:var(--d)}
+.star{color:var(--mark);font-size:13px;line-height:1}
+
+/* ---------- panels, inputs ---------- */
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px}
+input,select,button{font:inherit;color:var(--ink)}
+input[type=search],input[type=text],input[type=password],input[type=number],select{
+  background:var(--panel);border:1px solid var(--rule);border-radius:7px;padding:9px 11px;width:100%;min-width:0}
+input::placeholder{color:var(--faint)}
+select{appearance:none;padding-right:30px;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 51%,calc(100% - 10px) 51%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+button.go{background:var(--ink);color:var(--panel);border:1px solid var(--ink);border-radius:7px;padding:9px 18px;cursor:pointer;font-weight:500}
+button.go:hover{background:var(--body)}
+button.ghost{background:var(--panel);border:1px solid var(--rule);border-radius:7px;padding:9px 14px;cursor:pointer;color:var(--body)}
+button.ghost:hover{border-color:var(--muted)}
 .ask{display:flex;gap:8px;flex-wrap:wrap}
-.ask input{flex:1 1 320px}
-input[type=search],input[type=number],select,input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;min-width:0}
-input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
-button.go{font:700 14px Archivo;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
-button.ghost{font:600 13px Archivo;background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
-.examples{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.examples button{font:500 12.5px Archivo;background:var(--chip);color:var(--ink);border:0;border-radius:999px;padding:5px 11px;cursor:pointer}
-.understood{margin-top:10px;font-size:13px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.understood .u{background:var(--soft);color:var(--ink);border-radius:4px;padding:2px 8px;font:500 12px JetBrains Mono,monospace}
-.filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:12px}
-.filters label{display:flex;flex-direction:column;gap:4px;font:600 11px JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.range{display:flex;gap:6px}
-.range input{width:100%}
-.star{color:#b45309;font-size:13px}
-.plays{font:600 10.5px JetBrains Mono,monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:2px 0 6px}
-.sl{display:flex;flex-direction:column;gap:3px}
+.ask input{flex:1 1 280px}
+.examples{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.examples button{font:400 13px "Instrument Sans",sans-serif;background:var(--sunk);color:var(--muted);border:1px solid transparent;border-radius:999px;padding:4px 11px;cursor:pointer}
+.examples button:hover{color:var(--ink);border-color:var(--rule)}
+.understood{margin-top:11px;font-size:13px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.understood .u{background:var(--datum-soft);color:var(--datum);border-radius:4px;padding:2px 8px;font-size:12.5px;font-weight:500}
+.searchrow{display:flex;gap:8px;flex-wrap:wrap}
+.searchrow select{flex:0 1 190px}
+.searchrow input{flex:1 1 240px}
+.filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:13px 14px;margin-top:14px;
+  padding-top:14px;border-top:1px solid var(--hair)}
+.filters .sl{grid-column:span 2}
+@media (max-width:620px){.filters .sl{grid-column:span 1}}
+.filters label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted)}
+
+/* ---------- sliders ---------- */
 .sl .slhead{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
-.sl .slval{font:600 11px JetBrains Mono,monospace;color:var(--ink);text-transform:none;letter-spacing:0}
+.sl .slval{font-size:12.5px;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
 .sl .track{position:relative;height:22px}
-.sl .track .bar{position:absolute;top:9px;left:0;right:0;height:4px;border-radius:2px;background:var(--line)}
-.sl .track .sel{position:absolute;top:9px;height:4px;border-radius:2px;background:var(--accent)}
+.sl .track .bar{position:absolute;top:10px;left:0;right:0;height:3px;border-radius:2px;background:var(--hair)}
+.sl .track .sel{position:absolute;top:10px;height:3px;border-radius:2px;background:var(--datum)}
 .sl input[type=range]{position:absolute;top:0;left:0;width:100%;height:22px;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
 .sl input[type=range]:focus{outline:none}
-.sl input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--accent);outline-offset:2px}
-.sl input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--paper);border:2px solid var(--accent);cursor:grab;margin-top:0}
-.sl input[type=range]::-moz-range-thumb{pointer-events:auto;width:15px;height:15px;border-radius:50%;background:var(--paper);border:2px solid var(--accent);cursor:grab}
+.sl input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--focus);outline-offset:2px}
+.sl input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--datum);cursor:grab}
+.sl input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--datum);cursor:grab}
 .sl input[type=range]::-webkit-slider-runnable-track{height:22px;background:none}
 .sl input[type=range]::-moz-range-track{height:22px;background:none}
-.searchrow{display:flex;gap:8px;flex-wrap:wrap}
-.searchrow input{flex:1 1 260px}
-.resultbar{display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px;gap:10px;flex-wrap:wrap}
-.count{font:600 13px JetBrains Mono,monospace}
-.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
-table{border-collapse:collapse;width:100%;min-width:900px;font-size:13.5px}
-th{position:sticky;top:0;background:var(--ink);color:var(--paper);text-align:left;font:600 11.5px JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:.05em;padding:9px 10px;cursor:pointer;white-space:nowrap;user-select:none}
-th .arr{opacity:.6;margin-left:4px}
-td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:top}
+
+/* ---------- table ---------- */
+.resultbar{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 9px;gap:10px;flex-wrap:wrap}
+.count{font-weight:600;color:var(--ink);font-size:14.5px}
+.hint{color:var(--faint);font-size:12.5px}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+thead th{position:sticky;top:0;background:var(--panel);text-align:left;padding:10px 12px;white-space:nowrap;cursor:pointer;
+  font-weight:600;color:var(--muted);font-size:12.5px;border-bottom:1px solid var(--rule);z-index:2}
+thead th:hover{color:var(--ink)}
+.arr{color:var(--datum);margin-left:3px}
+tbody td{padding:9px 12px;border-bottom:1px solid var(--hair);vertical-align:top}
 tbody tr{cursor:pointer}
-tbody tr:hover{background:var(--soft)}
-td.num{font-variant-numeric:tabular-nums;font-family:JetBrains Mono,monospace;text-align:right;white-space:nowrap}
-.nf{color:var(--bad);font-weight:600}
+tbody tr:hover td{background:var(--sunk)}
+tbody tr:last-child td{border-bottom:0}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.nf{color:var(--faint)}
+mark{background:var(--mark-soft);color:inherit;border-radius:2px;padding:0 1px}
+.empty{padding:34px 12px;text-align:center;color:var(--muted)}
 .muted{color:var(--muted)}
-mark{background:var(--mark);color:inherit;border-radius:2px;padding:0 1px}
-/* detail */
-dialog{border:0;padding:0;max-width:760px;width:calc(100% - 24px);border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
-dialog::backdrop{background:rgba(20,16,10,.55)}
-.dh{padding:18px 20px 14px;border-bottom:3px solid var(--ink);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.dh h3{font:400 28px/1.05 "Archivo Black";margin:6px 0 4px}
-.db{padding:6px 20px 20px;max-height:70vh;overflow:auto}
-.dgroup{margin-top:16px}
-.dgroup h4{font:600 11px JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin:0 0 6px}
-.kv{display:grid;grid-template-columns:200px 1fr;gap:4px 14px;font-size:14px}
+
+/* ---------- detail dialog ---------- */
+dialog{border:0;padding:0;border-radius:12px;max-width:min(760px,calc(100% - 28px));width:100%;background:var(--panel);
+  color:var(--body);box-shadow:0 24px 60px -20px rgba(0,0,0,.4)}
+dialog::backdrop{background:rgba(10,14,18,.55)}
+.dh{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;padding:20px 22px 14px;border-bottom:1px solid var(--rule);
+  position:sticky;top:0;background:var(--panel);border-radius:12px 12px 0 0}
+.dh h3{font:600 25px/1.15 "Instrument Sans",sans-serif;margin:7px 0 3px}
+.dtags{display:inline-flex;flex-wrap:wrap;gap:4px;vertical-align:middle}
+.close{background:none;border:0;font-size:19px;cursor:pointer;color:var(--muted);line-height:1;padding:4px}
+.close:hover{color:var(--ink)}
+.db{padding:4px 22px 22px;max-height:min(74vh,760px);overflow:auto}
+.dgroup{padding:16px 0;border-bottom:1px solid var(--hair)}
+.dgroup:last-child{border-bottom:0}
+.dgroup h4{margin:0 0 10px;font:600 13px "Instrument Sans",sans-serif;color:var(--muted)}
+.kv{display:grid;grid-template-columns:minmax(150px,210px) 1fr;gap:7px 16px;margin:0;font-size:14px}
 .kv dt{color:var(--muted)}
-.kv dd{margin:0;word-break:break-word}
-.close{font:700 20px Archivo;background:transparent;border:0;color:var(--ink);cursor:pointer;padding:4px 8px}
-.flag{background:var(--flagbg);color:var(--flagfg);border-left:3px solid var(--warn);padding:8px 10px;border-radius:4px;font-size:13.5px}
-footer{color:var(--muted);font-size:12.5px;padding:30px 0 40px;border-top:1px solid var(--line);margin-top:30px}
-.empty{padding:22px;text-align:center;color:var(--muted)}
-@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
-@media (max-width:640px){.kv{grid-template-columns:1fr}.kv dt{margin-top:6px}header.top .wrap{padding-top:18px}}
+.kv dd{margin:0;color:var(--body);overflow-wrap:anywhere}
+.kv dd b{color:var(--ink)}
+.flag{background:var(--warnbg);color:var(--warn);border-radius:7px;padding:10px 12px;font-size:13.5px;line-height:1.5}
+.judged{font-family:"Newsreader",Georgia,serif;font-size:15px;line-height:1.55}
+
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--rule);color:var(--faint);font-size:12.5px;line-height:1.6;max-width:92ch}
+footer b{color:var(--muted)}
+
+@media (max-width:760px){
+  .mast .wrap{min-height:0}
+  .mast .name{width:100%}
+  .tabs{margin-left:0;width:100%;overflow-x:auto;padding-bottom:2px}
+  .kv{grid-template-columns:1fr;gap:2px 0}
+  .kv dt{margin-top:9px}
+  .scale .plot{height:76px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<div class="lock wrap" id="lock">
-  <div class="lockbox">
-    <div class="kicker">Private</div>
-    <h1>Festival Scouting</h1>
-    <p class="sub">Enter the password you were given to open the lineup data.</p>
+<div class="gate" id="lock">
+  <div class="wrap">
+    <div class="rule-datum" aria-hidden="true"></div>
+    <h1>Band Scouting</h1>
+    <p>Support-slot research for Sulynn Hago: every act on the 2026 Warped, Riot Fest and Fest bills, plus a follow list, measured against one band&rsquo;s draw.</p>
     <form id="lockForm" autocomplete="off">
       <input type="password" id="pw" placeholder="Password" aria-label="Password" autofocus>
-      <button class="go" type="submit" id="unlockBtn">Unlock</button>
+      <button class="go" type="submit" id="unlockBtn">Open</button>
       <div class="lockerr" id="lockErr" role="alert"></div>
     </form>
   </div>
+  <div class="wrap foot">Compiled October 2026. Figures read from each artist&rsquo;s own pages.</div>
 </div>
 <div class="app" id="app" hidden>
-<nav class="festbar" aria-label="Choose festival"><div class="wrap"><span class="festlabel">Festival</span><div class="festtoggle" id="festToggle" role="tablist"></div></div></nav>
-<header class="top">
+<nav class="mast" aria-label="Choose list"><div class="wrap">
+  <span class="name">Band Scouting</span>
+  <div class="tabs" id="festToggle" role="tablist"></div>
+</div></nav>
+<header class="hero">
   <div class="wrap">
-    <div>
-      <div class="kicker" id="kicker"></div>
-      <h1 id="title"></h1>
-      <div class="sub" id="subtitle"></div>
-      <div class="bench" id="bench"></div>
-    </div>
-    <div class="stats" id="stats"></div>
+    <h1 id="title"></h1>
+    <p class="sub" id="subtitle"></p>
+    <p class="where" id="kicker"></p>
+    <ul class="counts" id="stats"></ul>
+    <div class="scale" id="scale"></div>
   </div>
 </header>
 
 <main class="wrap">
   <section id="cohort">
-    <h2>Targeted Cohort<span class="tag">SUPPORT-SLOT TARGETS</span></h2>
+    <h2>Graded bands <span class="of" id="cohortCount"></span></h2>
     <p class="lede" id="cohortLede"></p>
     <div class="chips" id="gradeChips" role="group" aria-label="Filter cohort by grade"></div>
     <div class="grid" id="cohortGrid"></div>
   </section>
 
   <section id="ask">
-    <h2>Ask the data</h2>
-    <p class="lede">Type a question in plain English. It's read in your browser into filters — numbers, days, grades, genres, agencies, labels — and the table below updates.</p>
+    <h2>Ask in plain English</h2>
+    <p class="lede">Your question is read into filters here in the browser &mdash; sizes, days, grades, genres, agencies, labels &mdash; and the table below updates. Nothing is sent anywhere.</p>
     <div class="panel">
       <form class="ask" id="askForm">
-        <input type="search" id="askInput" placeholder="e.g. emo bands on Sunday under 200k Spotify listeners booked by Sequel" aria-label="Ask a question">
+        <input type="search" id="askInput" placeholder="emo bands under 150k Spotify listeners booked by Sequel" aria-label="Ask a question">
         <button class="go" type="submit">Ask</button>
         <button class="ghost" type="button" id="askClear">Clear</button>
       </form>
@@ -187,19 +301,19 @@ footer{color:var(--muted);font-size:12.5px;padding:30px 0 40px;border-top:1px so
   </section>
 
   <section id="all">
-    <h2>Search &amp; filter all acts</h2>
-    <p class="lede">Search one variable or all of them, then narrow with filters.</p>
+    <h2>Search and filter</h2>
+    <p class="lede">Search one field or all of them, then narrow with the filters and sliders.</p>
     <div class="panel">
       <div class="searchrow">
         <select id="field" aria-label="Field to search"></select>
-        <input type="search" id="q" placeholder="Search…" aria-label="Search text">
+        <input type="search" id="q" placeholder="Search bands, labels, agents…" aria-label="Search text">
         <button class="ghost" id="reset" type="button">Reset all</button>
       </div>
       <div class="filters" id="filters"></div>
     </div>
     <div class="resultbar">
       <div class="count" id="count"></div>
-      <div class="muted" style="font-size:12.5px">Click a column to sort · click a row for details</div>
+      <div class="hint">Click a column heading to sort, or a row for the full record</div>
     </div>
     <div class="tablewrap"><table id="tbl"><thead></thead><tbody></tbody></table></div>
   </section>
@@ -251,11 +365,14 @@ function combine(sets){
   const ex=[]; sets.forEach(d=>(d.examples||[]).forEach(e=>{if(ex.length<12&&!ex.includes(e))ex.push(e);}));
   const names=sets.map(d=>d.label);
   const joined=names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names[0];
+  const counts=sets.map(d=>`${d.label} (${d.bands.length})`).join(', ');
   return {id:'all',label:'All Bands',
-    kicker:sets.map(d=>d.kicker).join('  ·  '),
-    title:'Band Scouting',
-    subtitle:`Every act across ${joined} — ${bands.length} distinct bands with Instagram, Spotify, label, booking and estimated-earnings data, each graded against Sincere Engineer. Bands on more than one list appear once.`,
-    cohortLede:"Every band graded against Sincere Engineer: how close its draw is to hers (1.0 = same size) crossed with how close its music is to Sulynn's. A+ is shown first. Click any band for the full record.",
+    headline:'Who could we open for?',
+    where:`Four lists in one view — <b>${counts}</b>. A band tracked on more than one appears once, keeping its fullest record.`,
+    kicker:'',
+    title:'All Bands',
+    subtitle:`${bands.length} distinct bands, each placed against Sincere Engineer's draw and ranked by how close its music sits to Sulynn's.`,
+    cohortLede:"A+ means the band draws about the room Sincere Engineer draws and plays something close to what Sulynn plays. Starred bands were picked by hand, with a written reason. Click any band for its full record.",
     generated:sets[0].generated, benchmark:sets[0].benchmark,
     examples:['A+ bands across every list','bands on more than one 2026 bill','same size as Sincere Engineer','riot fest A+ bands','bands on Pure Noise Records','who does Ground Control book','emo bands under 150k Spotify listeners','shortlisted targets','bands with no booking agent found','top 10 biggest by Spotify','self-booked bands','independent bands over 100k listeners'],
     notes:sets.map(d=>`${d.label}: ${d.notes}`).join('  '),
@@ -285,12 +402,12 @@ async function unlock(pw){
 (async function(){
   await Promise.all(FEST_REGISTRY.map(f=>loadScript('data/'+f.id+'.enc.js')));
   const err=document.getElementById('lockErr'), btn=document.getElementById('unlockBtn');
-  if(!window.crypto||!crypto.subtle){err.textContent='This browser can\'t decrypt the page. Open the https:// link in a current browser.';return;}
+  if(!window.crypto||!crypto.subtle){err.textContent='This browser can\u2019t open the page. Use the https:// link in a current browser.';return;}
   const saved=ssGet('fs-pw'); if(saved){try{await unlock(saved);return;}catch(e){}}
   document.getElementById('lockForm').addEventListener('submit',async e=>{e.preventDefault();
     const pw=document.getElementById('pw').value; if(!pw){err.textContent='Enter the password.';return;}
-    btn.disabled=true;btn.textContent='Unlocking…';err.textContent='';
-    try{await unlock(pw);}catch(x){err.textContent='That password didn\'t work. Check it and try again.';btn.disabled=false;btn.textContent='Unlock';}
+    btn.disabled=true;btn.textContent='Opening\u2026';err.textContent='';
+    try{await unlock(pw);}catch(x){err.textContent='That password didn\u2019t work \u2014 check it and try again.';btn.disabled=false;btn.textContent='Open';}
   });
 })();
 function start(D){
@@ -329,19 +446,58 @@ BANDS.forEach(b=>{
 });
 
 // ---------- header ----------
-document.title=D.title;$('#kicker').textContent=D.kicker;$('#title').textContent=D.title;$('#subtitle').textContent=D.subtitle;$('#cohortLede').textContent=D.cohortLede;
-$('#bench').innerHTML = `Benchmark: <b>${esc(BM.name)}</b> — ${fmt(BM.instagram)} Instagram followers · ${fmt(BM.spotify)} Spotify monthly listeners · sells out 200–300 caps. Size index 1.0 = same size.`;
+document.title=(D.label||D.title)+' \u2014 Band Scouting';
+$('#title').textContent=D.headline||D.title;
+$('#subtitle').textContent=D.subtitle;
+$('#kicker').innerHTML=D.where||'';
+$('#cohortLede').textContent=D.cohortLede;
 const cohortN = BANDS.filter(b=>b.grade).length;
-const shortN = BANDS.filter(b=>b.shortlisted).length;
+const shortN  = BANDS.filter(b=>b.shortlisted).length;
+const aplusN  = BANDS.filter(b=>b.grade==='A+').length;
 $('#stats').innerHTML = [
-  [BANDS.length,'acts tracked'],[cohortN,'graded'],[BANDS.filter(b=>b.grade==='A+').length,'A+ targets'],
-  [shortN,'shortlisted']
-].map(([n,l])=>`<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
+  `<b>${fmt(BANDS.length)}</b> bands tracked`,
+  `<b>${fmt(cohortN)}</b> measured against her draw`,
+  `<b>${aplusN}</b> at grade A+`,
+  `<b>${shortN}</b> shortlisted by hand`,
+].map(t=>`<li>${t}</li>`).join('');
+
+// ---------- the calibration scale ----------
+(function drawScale(){
+  const el=$('#scale'); if(!el) return;
+  const graded=BANDS.filter(b=>b.size_vs_sincere_engineer>0);
+  if(graded.length<8){el.remove();return;}
+  const LO=0.1, HI=30, lg=Math.log10;
+  const pos=v=>100*(lg(v)-lg(LO))/(lg(HI)-lg(LO));
+  const onScale=graded.filter(b=>b.size_vs_sincere_engineer>=LO&&b.size_vs_sincere_engineer<=HI);
+  const off=graded.length-onScale.length;
+  const ticks=[0.1,0.25,0.5,1,2,5,10,25];
+  const gcl=b=>b.grade==='A+'?'g1':b.grade==='A'?'g2':b.grade==='A-'?'g3':'';
+  const BINS=190, bins=new Array(BINS).fill(0);
+  const binOf=v=>Math.min(BINS-1,Math.floor(pos(v)/100*BINS));
+  onScale.forEach(b=>bins[binOf(b.size_vs_sincere_engineer)]++);
+  const peak=Math.max.apply(null,bins);
+  const marks=onScale.map(b=>{
+    const x=pos(b.size_vs_sincere_engineer), n=bins[binOf(b.size_vs_sincere_engineer)];
+    const h=10+58*Math.sqrt(n/peak);
+    return `<span class="band ${gcl(b)}" style="left:${x.toFixed(2)}%;height:${h.toFixed(0)}px"></span>`;
+  }).join('');
+  const d=pos(1).toFixed(2);
+  el.innerHTML=`<div class="plot">${marks}
+      <span class="datum" style="left:${d}%"></span>
+      <span class="dlabel" style="left:${d}%"><b>1.00\u00d7</b><span>${esc(BM.name)}</span></span>
+      ${ticks.map(t=>`<span class="tickmark" style="left:${pos(t).toFixed(2)}%"></span>${t===1?'':`<span class="tlabel" style="left:${pos(t).toFixed(2)}%">${t<1?t+'\u00d7':t+'\u00d7'}</span>`}`).join('')}
+    </div>
+    <p class="caption">Each graded band placed by how its draw compares with ${esc(BM.name)}&rsquo;s &mdash; ${fmt(BM.instagram)} Instagram followers, ${fmt(BM.spotify)} Spotify monthly listeners, selling out 200&ndash;300-capacity rooms. Taller marks show where the scene is crowded. A band only reaches A+ if it sits near the line <em>and</em> plays something close to what Sulynn plays.${off?` ${off} band${off>1?'s':''} draw more than 30\u00d7 or less than a tenth of what she does, and sit off the ends of this axis.`:''}</p>`;
+})();
 
 // ---------- cohort ----------
 const grades=['A+','A','A-','B','C','D','Shortlist','All'];
 let cohortGrade='A+';
 function renderChips(){
+  const cc=$('#cohortCount');
+  if(cc) cc.textContent = cohortGrade==='All' ? `all ${fmt(cohortN)}`
+    : cohortGrade==='Shortlist' ? `${shortN} picked by hand`
+    : `${fmt(BANDS.filter(b=>b.grade===cohortGrade).length)} at ${cohortGrade}`;
   $('#gradeChips').innerHTML = grades.map(g=>{
     const n = g==='All'?cohortN:g==='Shortlist'?BANDS.filter(b=>b.shortlisted).length:BANDS.filter(b=>b.grade===g).length;
     return `<button class="chip" aria-pressed="${g===cohortGrade}" data-g="${g}">${g}<small>${n}</small></button>`;
@@ -351,26 +507,33 @@ function renderCohort(){
   renderChips();
   const list = BANDS.filter(b=>cohortGrade==='Shortlist'?b.shortlisted:(b.grade && (cohortGrade==='All'||b.grade===cohortGrade)))
     .sort((a,b)=>(b.grade_score??-1)-(a.grade_score??-1)||Math.abs((a.size_vs_sincere_engineer||99)-1)-Math.abs((b.size_vs_sincere_engineer||99)-1));
-  $('#cohortGrid').innerHTML = list.map(b=>`
-    <button class="card" data-name="${esc(b.name)}">
-      <div><span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>${b.shortlisted?' <span class="star" title="Hand-picked target">★</span>':''} <span class="meta">${[MULTI?b.festival:'',(b.day&&b.day!=='—')?b.day:'',b.genre].filter(Boolean).map(esc).join(' · ')}</span></div>
-      <h3>${esc(b.name)}</h3>
-      ${b.plays_count>1?`<div class="plays">${esc(b.plays_2026_text)}</div>`:''}
+  $('#cohortGrid').innerHTML = list.map(b=>{
+    const tags=[...(b.plays_2026||[]).map(f=>`<span class="tagpill play">${esc(f.replace(/ 2026$/,''))}</span>`),
+      ...((b.day&&b.day!=='\u2014'&&b.day!=='Schedule TBA')?[`<span class="tagpill">${esc(b.day)}</span>`]:[]),
+      ...String(b.genre||'').split('/').map(g=>g.trim()).filter(g=>g&&g!=='Unclassified').slice(0,2)
+        .map(g=>`<span class="tagpill">${esc(g)}</span>`)].join('');
+    const hasPitch=!!b.pitch;
+    const ag=b.agency&&!/^Not (found|researched)/.test(b.agency)&&b.agency!=='\u2014';
+    const lbl=b.label&&!/^(Not found|Not researched)/.test(b.label);
+    return `<button class="card ${gcls(b.grade).replace('g-','k-')}" data-name="${esc(b.name)}">
+      <div class="hd"><h3>${esc(b.name)}</h3>
+        <span class="grade ${gcls(b.grade)}">${esc(b.grade||'\u2014')}</span>${b.shortlisted?'<span class="star" title="Shortlisted by hand">\u2605</span>':''}</div>
+      <div class="tags">${tags}</div>
       <div class="nums">
-        <div><span>Instagram</span>${short(b.instagram_followers)}</div>
-        <div><span>Spotify</span>${short(b.spotify_listeners)}</div>
-        <div><span>Size vs SE</span>${b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'×':'—'}</div>
+        <div><b>${short(b.instagram_followers)}</b><span>Instagram</span></div>
+        <div><b>${short(b.spotify_listeners)}</b><span>Spotify</span></div>
+        <div><b>${b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'\u00d7':'\u2014'}</b><span>vs Sincere Engineer</span></div>
       </div>
-      <div class="pitch">${esc(b.pitch||b.grade_basis||'')}</div>
-      <div class="agency"><b>${esc(b.agency)}</b>${b.agent&&b.agent!=='—'?' · '+esc(b.agent):''}</div>
-    </button>`).join('') || '<div class="empty">No bands in this grade.</div>';
+      ${hasPitch?`<div class="pitch">${esc(b.pitch)}</div>`:''}
+      <div class="agency${ag?'':' nf'}">${lbl?`${esc(b.label)}`:''}${lbl&&ag?' &middot; ':''}${ag?`<b>${esc(b.agency)}</b>`:(lbl?'':'Label and booking not looked up')}</div>
+    </button>`;}).join('') || '<div class="empty">No bands at this grade. Try another chip.</div>';
 }
 $('#gradeChips').addEventListener('click',e=>{const b=e.target.closest('.chip'); if(!b) return; cohortGrade=b.dataset.g; renderCohort();});
 $('#cohortGrid').addEventListener('click',e=>{const c=e.target.closest('.card'); if(c) openDetail(c.dataset.name);});
 
 // ---------- fields & filters ----------
 const FIELDS = [
- ['_all','All variables'],['name','Artist'],['festival','Festival'],['grade','Grade'],['genre','Genre / style'],['hometown','Hometown'],['day','Day'],['status','Lineup status'],
+ ['_all','All fields'],['name','Artist'],['festival','Festival'],['grade','Grade'],['genre','Genre / style'],['hometown','Hometown'],['day','Day'],['status','Lineup status'],
  ['instagram_handle','Instagram handle'],['label','Record label'],['label_note','Label notes'],['agency','Booking agency'],['agent','Booking agent'],
  ['booking_notes','Other territories / booking notes'],['booking_evidence','Booking evidence'],['pitch','Fit / pitch angle'],['flags','Flags'],
  ['earnings_confidence','Earnings confidence'],['earnings_members','Earnings — members listed'],['watchlist','Watchlist'],
@@ -462,23 +625,23 @@ function currentList(){
   if(askState && askState.sort){const {key,dir,limit}=askState.sort; const nv=x=>(x===''||x==null)?-1:Number(x); list.sort((a,b)=>(nv(a[key])-nv(b[key]))*dir); if(limit) list=list.slice(0,limit);}
   return list;
 }
-const COLS=[['grade','Grade'],['name','Artist'],['plays_2026_text','Plays in 2026'],...(MULTI?[['festival','Tracked on']]:[]),['day','Day'],['genre','Genre'],['instagram_followers','Instagram'],['spotify_listeners','Spotify'],['size_vs_sincere_engineer','Size vs SE'],['est_income_top_member','Est. earnings*'],['label','Label'],['agency','Booking agency'],['agent','Agent(s)']];
+const COLS=[['grade','Grade'],['name','Artist'],['plays_2026_text','Plays in 2026'],['day','Day'],['genre','Genre'],['instagram_followers','Instagram'],['spotify_listeners','Spotify'],['size_vs_sincere_engineer','Size vs SE'],['est_income_top_member','Est. earnings*'],['label','Label'],['agency','Booking agency'],['agent','Agent(s)']];
 function hl(text){
   const q=$('#q').value.trim(); if(!q) return esc(text);
   let s=esc(text); q.split(/\s+/).filter(t=>t.length>1).forEach(t=>{s=s.replace(new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'),'<mark>$1</mark>');}); return s;
 }
 function renderTable(){
-  $('#tbl thead').innerHTML='<tr>'+COLS.map(([k,l])=>`<th data-k="${k}">${l}${k===sortKey?`<span class="arr">${sortDir>0?'▲':'▼'}</span>`:''}</th>`).join('')+'</tr>';
+  $('#tbl thead').innerHTML='<tr>'+COLS.map(([k,l])=>`<th data-k="${k}">${l}${k===sortKey?`<span class="arr">${sortDir>0?'↑':'↓'}</span>`:''}</th>`).join('')+'</tr>';
   const list=currentList();
-  $('#count').textContent=`${list.length} of ${BANDS.length} acts`;
+  $('#count').textContent=`${fmt(list.length)} of ${fmt(BANDS.length)} bands`;
   $('#tbl tbody').innerHTML = list.map(b=>`<tr data-name="${esc(b.name)}">
     <td>${b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'<span class="muted">—</span>'}${b.shortlisted?' <span class="star" title="Hand-picked target">★</span>':''}</td>
-    <td><b>${hl(b.name)}</b></td><td>${b.plays_count?hl(b.plays_2026_text):'<span class="muted">—</span>'}</td>${MULTI?`<td>${hl(b.festival)}</td>`:''}<td>${hl(b.day)}</td><td>${hl(b.genre)}</td>
-    <td class="num">${fmt(b.instagram_followers)}</td><td class="num">${fmt(b.spotify_listeners)}</td>
-    <td class="num">${b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'×':'—'}</td>
-    <td class="num" title="${b.earnings_confidence?esc(b.earnings_confidence+' · '+(b.earnings_error_band||'')):''}">${b.est_income_top_member?'$'+short(b.est_income_top_member):'—'}</td>
-    <td>${hl(b.label)}</td><td class="${b.booking_evidence==='Not found'?'nf':''}">${hl(b.agency)}</td><td>${hl(b.agent)}</td></tr>`).join('')
-    || `<tr><td colspan="${COLS.length}" class="empty">No acts match. Try loosening a filter.</td></tr>`;
+    <td><b>${hl(b.name)}</b></td><td>${b.plays_count?hl(b.plays_2026.map(f=>f.replace(/ 2026$/,'')).join(' · ')):'<span class="muted">\u2014</span>'}</td><td>${hl(b.day)}</td><td>${hl(b.genre)}</td>
+    <td class="n">${fmt(b.instagram_followers)}</td><td class="n">${fmt(b.spotify_listeners)}</td>
+    <td class="n">${b.size_vs_sincere_engineer!=null?b.size_vs_sincere_engineer.toFixed(2)+'\u00d7':'\u2014'}</td>
+    <td class="n" title="${b.earnings_confidence?esc(b.earnings_confidence+' \u2014 '+(b.earnings_error_band||'')):''}">${b.est_income_top_member?'$'+short(b.est_income_top_member):'—'}</td>
+    <td>${hl(b.label)}</td><td class="${/^Not /.test(b.agency||'')?'nf':''}">${hl(b.agency)}</td><td>${hl(b.agent)}</td></tr>`).join('')
+    || `<tr><td colspan="${COLS.length}" class="empty">Nothing matches those filters. Widen a slider or clear one.</td></tr>`;
 }
 $('#tbl thead').addEventListener('click',e=>{const th=e.target.closest('th'); if(!th)return; const k=th.dataset.k; if(sortKey===k)sortDir*=-1; else{sortKey=k;sortDir=(k.includes('followers')||k.includes('listeners')||k.includes('size'))?-1:1;} renderTable();});
 $('#tbl tbody').addEventListener('click',e=>{const tr=e.target.closest('tr[data-name]'); if(tr) openDetail(tr.dataset.name);});
@@ -594,18 +757,21 @@ function openDetail(name){
   const kv=rows=>'<dl class="kv">'+rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')+'</dl>';
   const d=$('#detail');
   d.innerHTML=`<div class="dh"><div>
-      <div>${b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'<span class="grade g-none">not in cohort</span>'} <span class="muted" style="font-size:13px">${[b.festival||'',(b.day&&b.day!=='—')?b.day:'',b.genre||''].filter(Boolean).map(esc).join(' · ')}</span></div>
+      <div>${b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'<span class="grade g-none">not in cohort</span>'} <span class="dtags">${[...(b.plays_2026||[]).map(f=>`<span class="tagpill play">${esc(f.replace(/ 2026$/,''))}</span>`),
+        ...((b.day&&b.day!=='\u2014'&&b.day!=='Schedule TBA')?[`<span class="tagpill">${esc(b.day)}</span>`]:[]),
+        ...String(b.genre||'').split('/').map(g=>g.trim()).filter(g=>g&&g!=='Unclassified')
+          .map(g=>`<span class="tagpill">${esc(g)}</span>`)].join('')}</span></div>
       <h3 id="dTitle">${esc(b.name)}</h3><div class="muted" style="font-size:13px">${esc(b.status)}</div></div>
       <button class="close" aria-label="Close" id="dClose">✕</button></div>
     <div class="db">
       ${b.flags?`<div class="dgroup"><div class="flag"><b>Flags:</b> ${esc(b.flags)}</div></div>`:''}
       <div class="dgroup"><h4>Targeting</h4>${kv([
-        ['Sincere Engineer grade',b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'—'],
+        ['Grade',b.grade?`<span class="grade ${gcls(b.grade)}">${esc(b.grade)}</span>`:'Not graded'],
         ['Size vs Sincere Engineer',b.size_vs_sincere_engineer!=null?`<b>${b.size_vs_sincere_engineer.toFixed(2)}×</b> <span class="muted">(1.00× = same draw)</span>`:'—'],
-        ['How the grade was reached',esc(b.grade_basis||'—')],
+        ['Why this grade',esc(b.grade_basis||'—')],
         ['Plays in 2026',esc(b.plays_2026_text||'—')],
         ...(b.shortlisted?[['Shortlisted','<b>Yes — hand-picked target'+(b.shortlist_tier?' ('+esc(b.shortlist_tier)+')':'')+'</b>']]:[]),
-        ...(b.pitch?[['Fit / pitch angle',esc(b.pitch)]]:[]),
+        ...(b.pitch?[['Why it\u2019s on the shortlist',`<span class="judged">${esc(b.pitch)}</span>`]]:[]),
         ...(b.poster_row?[['Riot Fest poster row',String(b.poster_row)+(b.predicted_set_time?' · predicted set time '+esc(b.predicted_set_time):'')]]:[])])}</div>
       ${(b.hometown||b.entity_type)?`<div class="dgroup"><h4>Band</h4>${kv([
         ...(b.hometown?[['Hometown',esc(b.hometown)]]:[]),
