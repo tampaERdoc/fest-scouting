@@ -86,22 +86,50 @@ h1,h2,h3{color:var(--ink);margin:0;font-weight:600;letter-spacing:-.016em}
 .counts{display:flex;flex-wrap:wrap;gap:4px 22px;margin:20px 0 0;padding:0;list-style:none;color:var(--muted);font-size:14.5px}
 .counts b{font-weight:600;color:var(--ink)}
 
-/* ---------- the calibration scale ---------- */
-.scale{margin:34px 0 0;padding:26px 0 26px}
-.scale .plot{position:relative;height:96px;border-bottom:1px solid var(--rule)}
-.scale .axis{position:absolute;inset:auto 0 0;height:1px}
+/* ---------- the number line ---------- */
+.scale{margin:30px 0 0;padding:34px 0 24px}
+.scale .top{display:flex;align-items:baseline;gap:12px 16px;flex-wrap:wrap;margin-bottom:22px;max-width:100%}
+.scale .read{min-width:0}
+.seg{display:inline-flex;gap:2px;background:var(--sunk);border-radius:8px;padding:3px}
+.seg button{appearance:none;background:none;border:0;border-radius:6px;cursor:pointer;color:var(--muted);
+  font:500 13.5px "Instrument Sans",sans-serif;padding:6px 12px;white-space:nowrap}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.seg .sm{display:none}
+@media (max-width:860px){.seg .lg{display:none}.seg .sm{display:inline}.seg{max-width:100%}}
+.scale .read{font-size:14.5px;color:var(--muted)}
+.scale .read b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.scale .read .cut{color:var(--mark);font-weight:600;font-variant-numeric:tabular-nums}
+.scale .read button{background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;font-size:13px;
+  text-decoration:underline;text-underline-offset:2px;padding:0 0 0 6px}
+.scale .read button:hover{color:var(--ink)}
+.plotwrap{position:relative;padding-top:4px;touch-action:none}
+.scale .plot{position:relative;height:104px;border-bottom:1px solid var(--rule);cursor:ew-resize}
 .scale .tickmark{position:absolute;bottom:0;width:1px;height:7px;background:var(--rule)}
 .scale .tlabel{position:absolute;bottom:-21px;transform:translateX(-50%);font-size:12px;color:var(--faint);white-space:nowrap}
 .scale .band{position:absolute;bottom:8px;width:2px;border-radius:1px;background:var(--c);opacity:.5}
 .scale .band.g1{background:var(--aplus);opacity:.95}
 .scale .band.g2{background:var(--a);opacity:.85}
 .scale .band.g3{background:var(--aminus);opacity:.7}
-.scale .datum{position:absolute;bottom:0;top:0;width:2px;background:var(--datum)}
+.scale .excl{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--panel);opacity:.82;pointer-events:none;z-index:2}
+.scale .datum{position:absolute;bottom:0;top:0;width:2px;background:var(--datum);pointer-events:none}
 .scale .datum::after{content:"";position:absolute;top:-4px;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--datum)}
-.scale .dlabel{position:absolute;top:-34px;transform:translateX(-50%);white-space:nowrap;text-align:center}
+.scale .dlabel{position:absolute;top:-30px;transform:translateX(-50%);white-space:nowrap;text-align:center;pointer-events:none}
 .scale .dlabel b{display:block;font:600 13px "Instrument Sans",sans-serif;color:var(--datum)}
 .scale .dlabel span{display:block;font-size:11.5px;color:var(--muted)}
-.scale .caption{margin:30px 0 0;font-size:13px;color:var(--muted);max-width:74ch}
+.cutline{position:absolute;top:-6px;bottom:-1px;width:2px;background:var(--mark);transform:translateX(-1px);touch-action:none;z-index:3}
+.cutline[hidden]{display:none!important}
+.cutline .grip{position:absolute;top:-19px;left:50%;transform:translateX(-50%);width:26px;height:22px;border-radius:6px;
+  background:var(--mark);cursor:grab;display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.cutline .grip:active{cursor:grabbing}
+.cutline .grip::before{content:"";width:8px;height:9px;border-left:2px solid #fff;border-right:2px solid #fff;opacity:.85}
+.cutline .grip:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.cutline .val{position:absolute;top:26px;left:6px;white-space:nowrap;background:var(--panel);
+  padding:1px 6px;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.14);
+  font:600 12.5px "Instrument Sans",sans-serif;color:var(--mark);font-variant-numeric:tabular-nums}
+.cutline.nearEnd .val{left:auto;right:6px}
+.scale .hintline{margin:30px 0 0;font-size:13px;color:var(--muted);max-width:76ch}
+.scale .caption{margin:8px 0 0;font-size:12.5px;color:var(--faint);max-width:78ch}
 
 /* ---------- sections ---------- */
 main{padding-bottom:64px}
@@ -109,6 +137,10 @@ section{padding-top:clamp(30px,4vw,52px);scroll-margin-top:68px}
 section > h2{font:600 clamp(19px,2.3vw,24px)/1.2 "Instrument Sans",sans-serif;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 section > h2 .of{font-weight:400;color:var(--faint);font-size:15px}
 .lede{color:var(--muted);margin:8px 0 18px;max-width:68ch;font-size:14.5px}
+.morenote{margin:12px 0 0;font-size:13px;color:var(--muted)}
+.morenote button{background:none;border:0;color:var(--datum);cursor:pointer;font:inherit;font-size:13px;
+  text-decoration:underline;text-underline-offset:2px;padding:0}
+.morenote button:hover{color:var(--ink)}
 
 /* ---------- chips ---------- */
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
@@ -332,6 +364,7 @@ footer b{color:var(--muted)}
     <p class="lede" id="cohortLede"></p>
     <div class="chips" id="gradeChips" role="group" aria-label="Filter cohort by grade"></div>
     <div class="grid" id="cohortGrid"></div>
+    <p class="morenote" id="cohortMore"></p>
   </section>
 
   <section id="ask">
@@ -520,52 +553,178 @@ $('#stats').innerHTML = [
   `<b>${shortN}</b> shortlisted by hand`,
 ].map(t=>`<li>${t}</li>`).join('');
 
-// ---------- the calibration scale ----------
-(function drawScale(){
+// ---------- the number line: drag a threshold, the bands below update ----------
+const AXES=[
+ {id:'size',key:'size_vs_sincere_engineer',label:'Size vs Sincere Engineer',
+  short:'Size',ticks:[0.1,0.25,0.5,1,2,5,10,25],lo:0.1,hi:30,
+  fmt:v=>v.toFixed(2)+'×',unit:'the draw of Sincere Engineer',mark:1,
+  noun:v=>`at least ${v.toFixed(2)}× her draw`},
+ {id:'ig',key:'instagram_followers',label:'Instagram followers',
+  short:'Instagram',ticks:[1e3,5e3,2e4,5e4,1e5,5e5,2e6],lo:500,hi:9e6,
+  fmt:v=>short(Math.round(v)),unit:'Instagram followers',mark:BM.instagram,
+  noun:v=>`${short(Math.round(v))} Instagram followers or more`},
+ {id:'sp',key:'spotify_listeners',label:'Spotify monthly listeners',
+  short:'Spotify',ticks:[1e3,1e4,5e4,2e5,1e6,5e6,2e7],lo:500,hi:6e7,
+  fmt:v=>short(Math.round(v)),unit:'Spotify monthly listeners',mark:BM.spotify,
+  noun:v=>`${short(Math.round(v))} Spotify monthly listeners or more`},
+];
+let axis=AXES[0], cut=null;   // cut === null means no threshold set
+const lg=Math.log10;
+const axPos=(A,v)=>100*(lg(Math.min(Math.max(v,A.lo),A.hi))-lg(A.lo))/(lg(A.hi)-lg(A.lo));
+const axVal=(A,p)=>Math.pow(10, lg(A.lo)+(lg(A.hi)-lg(A.lo))*Math.min(100,Math.max(0,p))/100);
+const axVals=A=>BANDS.map(b=>Number(b[A.key])).filter(v=>v>0);
+function meetsCut(b){
+  if(cut===null) return true;
+  const v=Number(b[axis.key]);
+  return v>0 && v>=cut;
+}
+function drawScale(){
   const el=$('#scale'); if(!el) return;
-  const graded=BANDS.filter(b=>b.size_vs_sincere_engineer>0);
-  if(graded.length<8){el.remove();return;}
-  const LO=0.1, HI=30, lg=Math.log10;
-  const pos=v=>100*(lg(v)-lg(LO))/(lg(HI)-lg(LO));
-  const onScale=graded.filter(b=>b.size_vs_sincere_engineer>=LO&&b.size_vs_sincere_engineer<=HI);
-  const off=graded.length-onScale.length;
-  const ticks=[0.1,0.25,0.5,1,2,5,10,25];
-  const gcl=b=>b.grade==='A+'?'g1':b.grade==='A'?'g2':b.grade==='A-'?'g3':'';
+  if(axVals(AXES[0]).length<8){el.remove();return;}
+  el.innerHTML=`<div class="top">
+      <div class="seg" role="group" aria-label="What the line measures">${AXES.map(a=>
+        `<button type="button" data-ax="${a.id}" aria-pressed="${a.id===axis.id}" aria-label="${a.label}"><span class="lg">${a.label}</span><span class="sm">${a.short}</span></button>`).join('')}</div>
+      <div class="read" id="scaleRead"></div>
+    </div>
+    <div class="plotwrap">
+      <div class="plot" id="plot"></div>
+      <div class="cutline" id="cutLine" hidden><span class="val" id="cutVal"></span>
+        <span class="grip" id="cutGrip" role="slider" tabindex="0" aria-label="Threshold"
+              aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></span></div>
+    </div>
+    <p class="hintline" id="scaleHint"></p>
+    <p class="caption" id="scaleCap"></p>`;
+  paintAxis();
+  const plot=$('#plot'), wrap=plot.parentElement;
+  const pct=e=>{const r=plot.getBoundingClientRect();return 100*(e.clientX-r.left)/r.width;};
+  let dragging=false;
+  const set=(p,live)=>{
+    const first = cut===null;
+    cut=axVal(axis,p);
+    if(first && cohortGrade!=='All'){ cohortGrade='All'; }   // show everything that clears the line
+    paintCut(); if(live) scheduleCohort();
+  };
+  wrap.addEventListener('pointerdown',e=>{
+    if(e.target.closest('.seg')) return;
+    dragging=true; wrap.setPointerCapture(e.pointerId); set(pct(e),true); e.preventDefault();
+  });
+  wrap.addEventListener('pointermove',e=>{ if(dragging) set(pct(e),true); });
+  wrap.addEventListener('pointerup',e=>{ if(dragging){dragging=false; renderCohort();} });
+  wrap.addEventListener('pointercancel',()=>{dragging=false;});
+  $('#cutGrip').addEventListener('keydown',e=>{
+    if(cut===null) return;
+    const step=e.shiftKey?5:1, p=axPos(axis,cut);
+    if(e.key==='ArrowRight'||e.key==='ArrowUp'){set(Math.min(100,p+step));renderCohort();e.preventDefault();}
+    if(e.key==='ArrowLeft'||e.key==='ArrowDown'){set(Math.max(0,p-step));renderCohort();e.preventDefault();}
+    if(e.key==='Home'){set(0);renderCohort();e.preventDefault();}
+    if(e.key==='End'){set(100);renderCohort();e.preventDefault();}
+    if(e.key==='Escape'){clearCut();}
+  });
+  el.querySelector('.seg').addEventListener('click',e=>{
+    const b=e.target.closest('button[data-ax]'); if(!b) return;
+    const next=AXES.find(a=>a.id===b.dataset.ax); if(next===axis) return;
+    const frac = cut===null?null:axPos(axis,cut);     // keep the same place on the line
+    axis=next;
+    el.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.ax===axis.id)));
+    if(frac!==null) cut=axVal(axis,frac);
+    paintAxis(); paintCut(); renderCohort();
+  });
+}
+function paintAxis(){
+  const A=axis, vals=axVals(A), plot=$('#plot');
   const BINS=190, bins=new Array(BINS).fill(0);
-  const binOf=v=>Math.min(BINS-1,Math.floor(pos(v)/100*BINS));
-  onScale.forEach(b=>bins[binOf(b.size_vs_sincere_engineer)]++);
-  const peak=Math.max.apply(null,bins);
-  const marks=onScale.map(b=>{
-    const x=pos(b.size_vs_sincere_engineer), n=bins[binOf(b.size_vs_sincere_engineer)];
-    const h=10+58*Math.sqrt(n/peak);
+  const binOf=v=>Math.min(BINS-1,Math.floor(axPos(A,v)/100*BINS));
+  const on=BANDS.filter(b=>Number(b[A.key])>0 && Number(b[A.key])>=A.lo && Number(b[A.key])<=A.hi);
+  on.forEach(b=>bins[binOf(Number(b[A.key]))]++);
+  const peak=Math.max.apply(null,bins)||1;
+  const gcl=b=>b.grade==='A+'?'g1':b.grade==='A'?'g2':b.grade==='A-'?'g3':'';
+  const marks=on.map(b=>{
+    const v=Number(b[A.key]), x=axPos(A,v), h=10+62*Math.sqrt(bins[binOf(v)]/peak);
     return `<span class="band ${gcl(b)}" style="left:${x.toFixed(2)}%;height:${h.toFixed(0)}px"></span>`;
   }).join('');
-  const d=pos(1).toFixed(2);
-  el.innerHTML=`<div class="plot">${marks}
-      <span class="datum" style="left:${d}%"></span>
-      <span class="dlabel" style="left:${d}%"><b>1.00\u00d7</b><span>${esc(BM.name)}</span></span>
-      ${ticks.map(t=>`<span class="tickmark" style="left:${pos(t).toFixed(2)}%"></span>${t===1?'':`<span class="tlabel" style="left:${pos(t).toFixed(2)}%">${t<1?t+'\u00d7':t+'\u00d7'}</span>`}`).join('')}
-    </div>
-    <p class="caption">Each graded band placed by how its draw compares with ${esc(BM.name)}&rsquo;s &mdash; ${fmt(BM.instagram)} Instagram followers, ${fmt(BM.spotify)} Spotify monthly listeners, selling out 200&ndash;300-capacity rooms. Taller marks show where the scene is crowded. A band only reaches A+ if it sits near the line <em>and</em> plays something close to what Sulynn plays.${off?` ${off} band${off>1?'s':''} draw more than 30\u00d7 or less than a tenth of what she does, and sit off the ends of this axis.`:''}</p>`;
-})();
+  const d=axPos(A,A.mark).toFixed(2);
+  plot.innerHTML=`${marks}<span class="excl" id="excl"></span>
+    <span class="datum" style="left:${d}%"></span>
+    <span class="dlabel" style="left:${d}%"><b>${A.fmt(A.mark)}</b><span>${esc(BM.name)}</span></span>
+    ${A.ticks.map(t=>`<span class="tickmark" style="left:${axPos(A,t).toFixed(2)}%"></span>`+
+      (Math.abs(axPos(A,t)-axPos(A,A.mark))<4?'':`<span class="tlabel" style="left:${axPos(A,t).toFixed(2)}%">${A.fmt(t)}</span>`)).join('')}`;
+  const off=axVals(A).length-on.length;
+  $('#scaleCap').innerHTML=`Every band with a figure for this, placed on a log scale; taller marks are where the scene is crowded, colour is grade. `+
+    `The teal line is ${esc(BM.name)} at ${A.fmt(A.mark)}.`+(off?` ${off} band${off>1?'s':''} sit beyond the ends of this axis.`:'');
+  paintCut();
+}
+function paintCut(){
+  const A=axis, line=$('#cutLine'), excl=$('#excl'), read=$('#scaleRead'), hint=$('#scaleHint');
+  const n=BANDS.filter(meetsCut).length;
+  if(cut===null){
+    line.hidden=true; if(excl) excl.style.width='0';
+    read.innerHTML=`<b>${fmt(axVals(A).length)}</b> bands have a figure for this`;
+    hint.textContent='Drag anywhere on the line to set a floor. The bands that clear it appear underneath.';
+    return;
+  }
+  const p=axPos(A,cut);
+  line.hidden=false; line.style.left=p.toFixed(2)+'%';
+  line.classList.toggle('nearEnd',p>86);
+  if(excl) excl.style.width=p.toFixed(2)+'%';
+  $('#cutVal').textContent=A.fmt(cut);
+  $('#cutGrip').setAttribute('aria-valuenow',p.toFixed(0));
+  $('#cutGrip').setAttribute('aria-valuetext',A.noun(cut));
+  read.innerHTML=`<b>${fmt(n)}</b> band${n===1?'':'s'} at <span class="cut">${A.fmt(cut)}</span> ${esc(A.unit)} or more`+
+    `<button type="button" id="cutClear">Clear</button>`+
+    `<button type="button" id="cutPush">Use in the filters below</button>`;
+  hint.textContent='';
+  $('#cutClear').onclick=clearCut;
+  $('#cutPush').onclick=pushCut;
+}
+function clearCut(){cut=null;cohortGrade='A+';paintCut();renderCohort();}
+function pushCut(){
+  const S=SLIDERS.find(x=>x.key===axis.key);
+  if(S&&S.n>1){S.vmin=Math.max(S.lo,Math.min(S.hi,cut));S.vmax=S.hi;
+    const A=$('#a_'+S.id),B=$('#b_'+S.id); if(A&&B){A.value=S.toPos(S.vmin);B.value=1000;}
+    S.paint(); renderTable();}
+  document.getElementById('all').scrollIntoView({behavior:'smooth',block:'start'});
+}
+let cohortRAF=null;
+function scheduleCohort(){
+  if(cohortRAF) return;
+  cohortRAF=requestAnimationFrame(()=>{cohortRAF=null;renderCohort();});
+}
 
 // ---------- cohort ----------
 const grades=['A+','A','A-','B','C','D','Shortlist','All'];
 let cohortGrade='A+';
 function renderChips(){
   const cc=$('#cohortCount');
-  if(cc) cc.textContent = cohortGrade==='All' ? `all ${fmt(cohortN)}`
-    : cohortGrade==='Shortlist' ? `${shortN} picked by hand`
-    : `${fmt(BANDS.filter(b=>b.grade===cohortGrade).length)} at ${cohortGrade}`;
+  const inCut=g=>BANDS.filter(b=>(g==='Shortlist'?b.shortlisted:(b.grade&&(g==='All'||b.grade===g)))&&meetsCut(b)).length;
+  if(cc) cc.textContent = (cohortGrade==='All' ? `${fmt(inCut('All'))}`
+    : cohortGrade==='Shortlist' ? `${fmt(inCut('Shortlist'))} picked by hand`
+    : `${fmt(inCut(cohortGrade))} at ${cohortGrade}`) + (cut===null?'':` \u00b7 ${axis.noun(cut)}`);
+  const le=$('#cohortLede');
+  if(le) le.textContent = cut===null ? D.cohortLede
+    : `Bands with ${axis.noun(cut)}, closest to the line first. Grade still shows how well each one matches on size and style; the chips narrow it further.`;
   $('#gradeChips').innerHTML = grades.map(g=>{
-    const n = g==='All'?cohortN:g==='Shortlist'?BANDS.filter(b=>b.shortlisted).length:BANDS.filter(b=>b.grade===g).length;
+    const n = inCut(g);
     return `<button class="chip" aria-pressed="${g===cohortGrade}" data-g="${g}">${g}<small>${n}</small></button>`;
   }).join('');
 }
+const CARD_CAP=60;
 function renderCohort(){
   renderChips();
-  const list = BANDS.filter(b=>cohortGrade==='Shortlist'?b.shortlisted:(b.grade && (cohortGrade==='All'||b.grade===cohortGrade)))
-    .sort((a,b)=>(b.grade_score??-1)-(a.grade_score??-1)||Math.abs((a.size_vs_sincere_engineer||99)-1)-Math.abs((b.size_vs_sincere_engineer||99)-1));
+  let list = BANDS.filter(b=>cohortGrade==='Shortlist'?b.shortlisted:(b.grade && (cohortGrade==='All'||b.grade===cohortGrade)))
+    .filter(meetsCut);
+  if(cut===null){
+    list.sort((a,b)=>(b.grade_score??-1)-(a.grade_score??-1)||Math.abs((a.size_vs_sincere_engineer||99)-1)-Math.abs((b.size_vs_sincere_engineer||99)-1));
+  }else{
+    // closest to the line first: the smallest bands that still clear it are the reachable ones
+    list.sort((a,b)=>Number(a[axis.key])-Number(b[axis.key]));
+  }
+  const total=list.length; if(total>CARD_CAP) list=list.slice(0,CARD_CAP);
+  const more=$('#cohortMore');
+  if(more) more.innerHTML = total>CARD_CAP
+    ? (cut===null
+        ? `Showing ${CARD_CAP} of ${fmt(total)}. <button type="button" id="moreToTable">See them all in the table</button>`
+        : `Showing the ${CARD_CAP} closest to the line. <button type="button" id="moreToTable">See all ${fmt(total)} in the table</button>`)
+    : '';
   $('#cohortGrid').innerHTML = list.map(b=>{
     const tags=[...(b.plays_2026||[]).map(f=>`<span class="tagpill play">${esc(f.replace(/ 2026$/,''))}</span>`),
       ...((b.day&&b.day!=='\u2014'&&b.day!=='Schedule TBA')?[`<span class="tagpill">${esc(b.day)}</span>`]:[]),
@@ -588,7 +747,9 @@ function renderCohort(){
       ${hasPitch?`<div class="pitch">${esc(b.pitch)}</div>`:''}
       <div class="agency${ag?'':' nf'}">${lbl?`${esc(b.label)}`:''}${lbl&&ag?' &middot; ':''}${ag?`<b>${esc(b.agency)}</b>`:(lbl?'':'Label and booking not looked up')}</div>
       </button>
-    </div>`;}).join('') || '<div class="empty">No bands at this grade. Try another chip.</div>';
+    </div>`;}).join('') || `<div class="empty">${cut===null?'No bands at this grade. Try another chip.':'No '+(cohortGrade==='All'?'band':cohortGrade+' band')+' clears that line. Drag it left, or pick another grade.'}</div>`;
+  const mt=$('#moreToTable');
+  if(mt) mt.onclick=()=>{ if(cut!==null) pushCut(); else document.getElementById('all').scrollIntoView({behavior:'smooth',block:'start'}); };
 }
 $('#gradeChips').addEventListener('click',e=>{const b=e.target.closest('.chip'); if(!b) return; cohortGrade=b.dataset.g; renderCohort();});
 $('#cohortGrid').addEventListener('click',e=>{
@@ -1087,7 +1248,7 @@ $('#detail').addEventListener('click',e=>{if(e.target.id==='detail')e.target.clo
 
 $('#foot').innerHTML=`<b>${esc(D.label)}</b> · data compiled ${esc(D.generated)}. ${esc(D.notes||'')} <b>Est. earnings*</b> are modeled estimates from the supplied earnings workbook — inferences from touring tier, venue capacity, catalog ownership, songwriting splits and label structure, with ±40–60% stated error bars — not reported or audited figures. Open any band for its per-member breakdown and confidence. Ask-the-data runs entirely in your browser with keyword rules — no AI service.`;
 
-renderCohort(); renderTable();
+drawScale(); renderCohort(); renderTable();
 }
 </script>
 </body>

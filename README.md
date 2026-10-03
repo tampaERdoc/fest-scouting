@@ -36,6 +36,11 @@ Instagram followers, Spotify monthly listeners, size index and estimated earning
 ## Estimated earnings
 The earnings columns come from a supplied punk/indie earnings ranking workbook and are **modeled estimates, not reported or audited figures**. The source derives each from touring tier, venue capacity, catalog ownership, songwriting splits and label structure, and states error bars of ±40% for ranks 1–300 and ±60% for 301–803; ranks 804–1000 are "cohort positions" describing a place in the scene economy rather than a real individual. The workbook ranks **people**, not bands, so a band may contribute several rows: `est_income_top_member` is the highest single estimate and `est_income_members_sum` adds only the members the workbook lists. Every detail view carries the caveat and the per-member breakdown; the table column is asterisked.
 
+## The number line
+The hero is an instrument, not a picture. Drag anywhere on it to set a floor and the band grid underneath becomes everything at or above that mark, closest to the line first — the smallest bands that still clear the bar are usually the reachable ones. The segmented control switches what the line measures: **size vs Sincere Engineer**, **Instagram followers** or **Spotify monthly listeners**. Her own figure stays marked in teal on all three, so the benchmark travels with you.
+
+Setting a floor widens the grade chip to All, since A+ bands cluster near 1.00× and dragging right would otherwise empty the grid; the chips still narrow from there. **Use in the filters below** pushes the floor into the matching slider and jumps to the full table. Arrow keys move the handle when it has focus, Shift for bigger steps, Escape to clear.
+
 ## Building an export
 Tick bands on the cards or in the table. The tick travels with the band, so a selection survives switching lists and filtering; the bar at the foot of the table says how many of the picked bands are currently hidden by filters. **Select these N** takes everything the current filters show.
 
