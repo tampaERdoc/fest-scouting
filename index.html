@@ -207,23 +207,40 @@ button.ghost:hover{border-color:var(--muted)}
 .searchrow input{flex:1 1 240px}
 .filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:13px 14px;margin-top:14px;
   padding-top:14px;border-top:1px solid var(--hair)}
-.filters .sl{grid-column:span 2}
-@media (max-width:620px){.filters .sl{grid-column:span 1}}
+
 .filters label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted)}
 
-/* ---------- sliders ---------- */
-.sl .slhead{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
-.sl .slval{font-size:12.5px;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
-.sl .track{position:relative;height:22px}
-.sl .track .bar{position:absolute;top:10px;left:0;right:0;height:3px;border-radius:2px;background:var(--hair)}
-.sl .track .sel{position:absolute;top:10px;height:3px;border-radius:2px;background:var(--datum)}
-.sl input[type=range]{position:absolute;top:0;left:0;width:100%;height:22px;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
+/* ---------- range sliders ---------- */
+.sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px 26px;margin-top:16px;
+  padding-top:16px;border-top:1px solid var(--hair)}
+.sl{display:flex;flex-direction:column;gap:7px;min-width:0}
+.sl .slhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sl .sllabel{font-size:13.5px;font-weight:500;color:var(--ink)}
+.sl .slval{font-size:13px;color:var(--datum);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sl .slval.off{color:var(--faint);font-weight:400}
+.sl .track{position:relative;height:52px}
+.sl .hist{position:absolute;left:0;right:0;bottom:16px;top:0;display:flex;align-items:flex-end;gap:1px}
+.sl .hist i{flex:1;background:var(--hair);border-radius:1px 1px 0 0;min-height:1px;transition:background .12s}
+.sl .hist i.on{background:var(--datum);opacity:.55}
+.sl .rail{position:absolute;left:0;right:0;bottom:11px;height:4px;border-radius:2px;background:var(--hair)}
+.sl .sel{position:absolute;bottom:11px;height:4px;border-radius:2px;background:var(--datum)}
+.sl input[type=range]{position:absolute;left:0;bottom:0;width:100%;height:26px;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
 .sl input[type=range]:focus{outline:none}
 .sl input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--focus);outline-offset:2px}
-.sl input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--datum);cursor:grab}
-.sl input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--datum);cursor:grab}
-.sl input[type=range]::-webkit-slider-runnable-track{height:22px;background:none}
-.sl input[type=range]::-moz-range-track{height:22px;background:none}
+.sl input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--panel);border:2.5px solid var(--datum);cursor:grab;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.sl input[type=range]::-webkit-slider-thumb:active{cursor:grabbing}
+.sl input[type=range]::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;
+  background:var(--panel);border:2.5px solid var(--datum);cursor:grab;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.sl input[type=range]::-webkit-slider-runnable-track{height:26px;background:none}
+.sl input[type=range]::-moz-range-track{height:26px;background:none}
+.sl .ends{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+.sl .ends input{width:100%;padding:5px 8px;font-size:12.5px;text-align:right}
+.sl .ends span{color:var(--faint)}
+.sl .ends button{background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;padding:2px 4px;
+  text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.sl .ends button:hover{color:var(--ink)}
+.sl .ends button[hidden]{display:none}
 
 /* ---------- table ---------- */
 .resultbar{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 9px;gap:10px;flex-wrap:wrap}
@@ -340,6 +357,7 @@ footer b{color:var(--muted)}
         <input type="search" id="q" placeholder="Search bands, labels, agents…" aria-label="Search text">
         <button class="ghost" id="reset" type="button">Reset all</button>
       </div>
+      <div class="sliders" id="sliders"></div>
       <div class="filters" id="filters"></div>
     </div>
     <div class="resultbar">
@@ -618,26 +636,80 @@ SLIDERS.forEach(S=>{
   S.lo=vals.length?vals[0]:0; S.hi=vals.length?vals[vals.length-1]:1; S.n=vals.length;
   S.toVal=p=>S.log?Math.exp(Math.log(S.lo)+(Math.log(S.hi)-Math.log(S.lo))*p/1000):S.lo+(S.hi-S.lo)*p/1000;
   S.toPos=v=>S.log?Math.round(1000*(Math.log(v)-Math.log(S.lo))/(Math.log(S.hi)-Math.log(S.lo))):Math.round(1000*(v-S.lo)/(S.hi-S.lo));
-  S.a=0; S.b=1000;
+  S.a=0; S.b=1000; S.vmin=S.lo; S.vmax=S.hi;
+  // where the bands actually sit, drawn behind the rail
+  S.hist=new Array(40).fill(0);
+  vals.forEach(v=>{S.hist[Math.min(39,Math.max(0,Math.floor(S.toPos(v)/1000*40)))]++;});
+  S.histPeak=Math.max(1,...S.hist);
+  S.parse=t=>{
+    const m=String(t).trim().toLowerCase().replace(/[,$×x\s]/g,'').match(/^([\d.]+)(k|m)?$/);
+    if(!m) return null;
+    let v=parseFloat(m[1]); if(m[2]==='k')v*=1e3; if(m[2]==='m')v*=1e6;
+    return isFinite(v)?v:null;
+  };
 });
-function sliderHTML(S){return `<label class="sl"><span class="slhead"><span>${S.label}</span><span class="slval" id="v_${S.id}">any</span></span>
-  <span class="track"><span class="bar"></span><span class="sel" id="sel_${S.id}"></span>
-  <input type="range" min="0" max="1000" value="0" id="a_${S.id}" aria-label="${S.label} minimum">
-  <input type="range" min="0" max="1000" value="1000" id="b_${S.id}" aria-label="${S.label} maximum"></span></label>`;}
+const HBINS=40;
+function sliderHTML(S){
+  return `<div class="sl" id="sl_${S.id}">
+    <div class="slhead"><span class="sllabel">${S.label}</span><span class="slval off" id="v_${S.id}">any</span></div>
+    <div class="track">
+      <div class="hist" id="h_${S.id}">${Array.from({length:HBINS},(_,i)=>
+        `<i style="height:${(4+92*Math.sqrt((S.hist[i]||0)/S.histPeak)).toFixed(1)}%"></i>`).join('')}</div>
+      <div class="rail"></div><div class="sel" id="sel_${S.id}"></div>
+      <input type="range" min="0" max="1000" value="0" id="a_${S.id}" aria-label="${S.label}, lowest">
+      <input type="range" min="0" max="1000" value="1000" id="b_${S.id}" aria-label="${S.label}, highest">
+    </div>
+    <div class="ends">
+      <input type="text" inputmode="numeric" id="na_${S.id}" aria-label="${S.label}, type the lowest">
+      <span>to</span>
+      <input type="text" inputmode="numeric" id="nb_${S.id}" aria-label="${S.label}, type the highest">
+      <button type="button" id="r_${S.id}" hidden>Reset</button>
+    </div>
+  </div>`;}
 $('#filters').innerHTML = FILTERS.map(f=>f.opts.length>25
    ? `<label>${f.label}<input list="dl-${f.id}" id="${f.id}" placeholder="All (${f.opts.length}) — type to search" autocomplete="off"><datalist id="dl-${f.id}">${f.opts.map(o=>`<option value="${esc(o)}"></option>`).join('')}</datalist></label>`
    : `<label>${f.label}<select id="${f.id}"><option value="">All</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select></label>`).join('')
- + SLIDERS.filter(S=>S.n>1).map(sliderHTML).join('');
+;
+$('#sliders').innerHTML = SLIDERS.filter(S=>S.n>1).map(sliderHTML).join('');
 SLIDERS.filter(S=>S.n>1).forEach(S=>{
-  const A=$('#a_'+S.id), B=$('#b_'+S.id), V=$('#v_'+S.id), SEL=$('#sel_'+S.id);
-  S.sync=()=>{
-    S.a=Math.min(+A.value,+B.value); S.b=Math.max(+A.value,+B.value);
+  const A=$('#a_'+S.id), B=$('#b_'+S.id), V=$('#v_'+S.id), SEL=$('#sel_'+S.id),
+        NA=$('#na_'+S.id), NB=$('#nb_'+S.id), H=$('#h_'+S.id), R=$('#r_'+S.id),
+        bars=[...H.children];
+  // paint from whatever vmin/vmax currently are
+  S.paint=()=>{
+    const full=(S.vmin<=S.lo&&S.vmax>=S.hi);
+    S.a=S.toPos(S.vmin); S.b=S.toPos(S.vmax);
     SEL.style.left=(S.a/10)+'%'; SEL.style.width=((S.b-S.a)/10)+'%';
-    V.textContent=(S.a===0&&S.b===1000)?'any':`${S.fmt(S.toVal(S.a))} – ${S.fmt(S.toVal(S.b))}`;
+    V.textContent=full?'any':`${S.fmt(S.vmin)} – ${S.fmt(S.vmax)}`;
+    V.classList.toggle('off',full);
+    R.hidden=full;
+    bars.forEach((el,i)=>{const c=(i+0.5)/40*1000; el.classList.toggle('on',c>=S.a&&c<=S.b);});
+    if(document.activeElement!==NA) NA.value=S.fmt(S.vmin);
+    if(document.activeElement!==NB) NB.value=S.fmt(S.vmax);
   };
-  S.reset=()=>{A.value=0;B.value=1000;S.sync();};
-  [A,B].forEach(el=>el.addEventListener('input',()=>{S.sync();renderTable();}));
-  S.sync();
+  const fromSliders=()=>{
+    const a=Math.min(+A.value,+B.value), b=Math.max(+A.value,+B.value);
+    S.vmin = a<=0 ? S.lo : S.toVal(a);
+    S.vmax = b>=1000 ? S.hi : S.toVal(b);
+    S.paint(); renderTable();
+  };
+  S.reset=()=>{S.vmin=S.lo;S.vmax=S.hi;A.value=0;B.value=1000;S.paint();};
+  [A,B].forEach(el=>el.addEventListener('input',fromSliders));
+  [[NA,'vmin',A],[NB,'vmax',B]].forEach(([inp,key,rng])=>{
+    const commit=()=>{
+      const v=S.parse(inp.value);
+      if(v!=null){
+        S[key]=Math.max(S.lo,Math.min(S.hi,v));            // typed numbers are kept exactly
+        if(S.vmin>S.vmax){const t=S.vmin;S.vmin=S.vmax;S.vmax=t;}
+        A.value=S.toPos(S.vmin); B.value=S.toPos(S.vmax);
+      }
+      S.paint(); renderTable();
+    };
+    inp.addEventListener('change',commit);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();commit();inp.blur();}});
+  });
+  R.addEventListener('click',()=>{S.reset();renderTable();});
+  S.paint();
 });
 
 // ---------- state ----------
@@ -653,10 +725,9 @@ function currentList(){
         else { const lv=v.toLowerCase(); if(!f.opts.some(o=>o.toLowerCase().includes(lv)&&f.test(b,o))) return false; } }
       else if(!f.test(b,v)) return false;}
     for(const S of SLIDERS){
-      if(S.n<2||(S.a===0&&S.b===1000)) continue;
+      if(S.n<2||(S.vmin<=S.lo&&S.vmax>=S.hi)) continue;
       const bv=(b[S.key]===''||b[S.key]==null)?null:Number(b[S.key]);
-      if(bv==null) return false;
-      if(bv<S.toVal(S.a)*0.999||bv>S.toVal(S.b)*1.001) return false;
+      if(bv==null||bv<S.vmin||bv>S.vmax) return false;
     }
     if(askState && !askState.test(b)) return false;
     return true;
